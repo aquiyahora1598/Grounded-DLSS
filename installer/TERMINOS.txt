@@ -1,0 +1,67 @@
+GROUNDED DLSS - TERMINOS DE USO Y COMPONENTES EXTERNOS
+21 de octubre de 2026
+
+ESTADO DEL CANDIDATO
+Este paquete es una beta con revision de licencias y marcas pendiente;
+consulta los puntos abiertos en LEGAL.md. No representa aprobacion de NVIDIA,
+Obsidian, Microsoft ni Valve. Es gratuito, experimental y no oficial.
+
+CODIGO PROPIO
+El codigo original del proyecto se ofrece bajo la licencia MIT adjunta en
+LICENSE.txt. Estas condiciones no reducen los permisos MIT del codigo propio.
+La licencia MIT no concede derechos sobre componentes o marcas de terceros.
+No se exige un pago, registro, telemetria ni envio de partidas.
+
+DLL Y SDK DE NVIDIA
+El paquete no contiene nvngx_dlss.dll, controladores ni encabezados del SDK.
+El mod solo utiliza bibliotecas DLSS SR x64 de produccion presentes en los
+componentes locales de NVIDIA, con firma Authenticode valida. Compara versiones
+y comprueba el controlador minimo declarado. NGX determina la disponibilidad
+final. No hay descarga de bibliotecas, selector manual ni respaldo DLSS privado.
+La cache original NVIDIA no se modifica. Se prepara una sola copia de trabajo
+para la carga de NGX, que no sirve como fuente si desaparece la biblioteca local.
+No se buscan DLL en otros juegos ni se ejecutan para validar su autenticidad.
+
+La DLL y el SDK conservan sus condiciones originales. Antes de instalar,
+lee NVIDIA-RTX-SDK-LICENSE.txt, incluido integramente para consulta. El texto
+ingles de NVIDIA rige sus componentes; este resumen no lo sustituye ni concede
+una sublicencia adicional. Obtener la DLL por separado no elimina las
+obligaciones de una aplicacion que incorpora o se basa en el SDK.
+
+En particular, para los componentes NVIDIA: uso en sistemas con GPU NVIDIA
+compatible; no ingenieria inversa, descompilacion o desensamblado del SDK salvo
+el alcance que una ley aplicable permita imperativamente; no eliminacion de
+avisos de propiedad, elusion de protecciones ni distribucion autonoma del SDK
+fuera de lo autorizado por NVIDIA. No se concede derecho a aplicar a esos
+componentes la licencia MIT del mod, ni a usar marcas o alegar respaldo oficial.
+Se aplican los controles de exportacion y restricciones legales correspondientes.
+Si no podes aceptar las condiciones aplicables, no instales esos componentes.
+
+JUEGO Y MARCAS
+Necesitas tu propia copia legitima y compatible de Grounded. El mod no concede
+derechos sobre el juego, sus recursos ni sus marcas. Debes cumplir las condiciones
+aplicables del juego y Steam, con las excepciones que establezca la ley.
+No incluye recursos del juego ni funciones para eludir DRM o autenticacion.
+No se ha obtenido una autorizacion especifica del editor para esta integracion.
+
+Grounded DLSS isn't endorsed by Obsidian Entertainment, Inc. and doesn't reflect
+the views or opinions of Obsidian Entertainment, Inc. or anyone officially involved
+with making Grounded. Grounded and Obsidian Entertainment and all related logos
+are trademarks or registered trademarks of Obsidian Entertainment, Inc.
+
+RIESGOS, DATOS Y DESINSTALACION
+Se proporciona sin garantia, sujeto a los derechos que no puedan excluirse por
+ley. Guarda tus partidas y cerra el juego antes de instalar o desinstalar. No se
+garantizan rendimiento, calidad en todas las escalas ni compatibilidad universal.
+La instalacion cambia archivos propios del mod y los ajustes descritos en LEEME.
+Los archivos modificados por el usuario se conservan al desinstalar. Los registros
+locales pueden contener rutas de archivos; revisalos antes de compartirlos.
+Si no encuentra una fuente NVIDIA compatible, el instalador avisa y se detiene
+sin modificar el juego. El instalador y esta seleccion local no descargan DLSS.
+La infraestructura propia de NVIDIA puede gestionar sus componentes segun sus
+ajustes y condiciones; el mod no cambia esos ajustes ni solicita actualizaciones.
+
+La desinstalacion retira la copia de trabajo propia y valida. Los archivos ajenos
+o alterados se conservan. Los respaldos de configuracion permiten restaurar los
+ajustes anteriores y se mantienen separados de la biblioteca de trabajo.
+No se requiere aceptar una licencia nueva para desinstalar o recuperar.

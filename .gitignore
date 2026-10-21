@@ -1,0 +1,30 @@
+build/
+traces/
+evidence/
+__pycache__/
+*.obj
+*.pyc
+*.pdb
+*.dmp
+*.lib
+*.exp
+*.dll
+*.asi
+*.exe
+*.zip
+*.hold
+external/
+dist/
+snapshots/
+config/
+.engram/
+.codex/
+knowledge_corpus/
+graphify-out/
+Pruebas Grounded/
+node_modules/
+.env
+.env.*
+
+# Export the public source allowlist with tools/build_source_release.py.
+# This research workspace itself is not a publishable repository.

@@ -1,0 +1,85 @@
+GROUNDED DLSS 11.23.4 BETA (runtime 11.23.2 sem alterações)
+A revisão de licenças e marcas continua pendente. Leia LEGAL.md.
+
+REQUISITOS
+Grounded Steam 1.4.7.4815, Windows 10/11 x64, DirectX 12 e NVIDIA RTX.
+É necessário ter uma biblioteca DLSS SR de produção compatível nos componentes
+locais da NVIDIA: cache NGX ou pacote ativo do driver. O instalador e o mod
+não baixam bibliotecas, não incluem uma DLL NVIDIA nem mantêm reserva privada.
+Uma instalação limpa do driver pode não conter esse componente.
+
+INSTALAR OU ATUALIZAR
+1. Feche o Grounded normalmente e faça backup dos saves.
+2. Abra GroundedDLSS-11.23.4-beta-Setup.exe e selecione seu idioma.
+3. Escolha a pasta do Grounded, leia os termos e licenças, aceite e selecione
+   Instalar / atualizar. Se não houver uma fonte NVIDIA compatível, nada será alterado.
+4. Inicie o jogo com DirectX 12. O instalador já desativou o FSR.
+
+Estão disponíveis espanhol, inglês e português do Brasil. O idioma inicial
+segue o Windows; você pode alterá-lo no topo do instalador. Trocar o idioma
+desmarca a aceitação da licença. As licenças originais de terceiros não mudam.
+O FSR é desativado na instalação/atualização para não combiná-lo com DLSS.
+A seleção anterior é salva para a desinstalação. Resolução, escala de renderização,
+qualidade gráfica e controles são preservados. Se você reativar o FSR manualmente,
+desative-o novamente para usar o DLSS. Não há seletor de DLL nem opção de download.
+
+COMO O DLSS É OBTIDO
+A cada inicialização, são comparadas as versões numéricas das bibliotecas locais
+da NVIDIA e verificados sua identidade SR x64 de produção, assinatura Authenticode
+e driver mínimo declarado. O NGX confirma a disponibilidade. Não há lista fixa
+de versões nem busca em outros jogos. É preparada uma única cópia de trabalho em:
+Maine\Binaries\Win64\plugins\GroundedDLSS-data\auto-runtime\nvngx_dlss.dll
+Ela é renovada a partir da fonte NVIDIA e não serve de reserva se essa fonte
+desaparecer. Nesse caso, o DLSS fica desativado e é usado o passe original da Unreal.
+Reinicie o jogo após a NVIDIA atualizar seus componentes. A busca não ocorre
+a cada quadro e não altera perfis NVIDIA, drivers ou o cache original.
+Atualizações removem a antiga DLL de reserva do mod somente se corresponder ao
+registro de instalação; arquivos modificados pelo usuário são preservados.
+
+CONTROLES
+A escala de resolução do jogo seleciona o modo mais próximo:
+100 = DLAA, 67 = Qualidade, 58 = Equilibrado, 50 = Desempenho,
+33 = Ultra Desempenho (33,32% internamente; por exemplo 853x480 a 2560x1440,
+sem reamostragem da imagem inteira).
+F8 alterna entre DLSS e o passe temporal original da Unreal na mesma escala interna.
+A nitidez está desativada em todos os modos por padrão. Configuração:
+Maine\Binaries\Win64\plugins\GroundedDLSS.ini
+Presets automáticos solicitados: K em RTX 20/30 e GPUs desconhecidas; em RTX 40
+ou posteriores, K em DLAA/Qualidade/Equilibrado, M em Desempenho e L em Ultra.
+As substituições do perfil NVIDIA podem prevalecer sobre o modelo solicitado.
+
+PROFUNDIDADE DE CAMPO E LIMITAÇÕES
+O menu do jogo controla a intensidade do efeito. FixFocusTiming=1 usa interpolação
+por tempo no foco automático nativo. Um TimeConstantSeconds maior torna a mudança
+mais lenta. FixFocusTiming=0 restaura a interpolação original após reiniciar.
+Não são alteradas distâncias físicas nem adicionado um passe extra de desfoque.
+Não é garantido o mesmo desempenho de outros escaladores. Ultra Desempenho pode
+perder detalhes com poucos pixels de entrada. As transições espaciais da profundidade
+de campo ainda estão em avaliação. Nem todas as resoluções, drivers, máquinas ou
+mods foram testados. Uma atualização do jogo pode impedir a ativação devido à
+verificação do executável. O executável original não é alterado no disco.
+
+DESINSTALAR
+Feche o jogo, abra o mesmo instalador e selecione Desinstalar, ou execute:
+Maine\Binaries\Win64\GroundedDLSS-install\Desinstalar Grounded DLSS.exe
+São removidos os arquivos próprios e a cópia de trabalho própria e válida.
+As configurações anteriores são restauradas, preservando outras alterações.
+A seleção anterior do FSR é restaurada, a menos que você tenha escolhido outro
+FSR após a instalação. Arquivos modificados, backups de configuração, diagnósticos
+e o desinstalador podem permanecer. Backups de configuração não são bibliotecas DLSS.
+Saves, segurança e perfis NVIDIA não mudam. Recuperar operação reverte uma instalação
+interrompida.
+
+LICENÇAS E SUPORTE
+This software contains source code provided by NVIDIA Corporation.
+Código próprio sob MIT. Leia TERMINOS.pt-BR.txt, NVIDIA-RTX-SDK-LICENSE.txt e
+THIRD-PARTY-NOTICES.txt; as condições de terceiros permanecem separadas. Esta
+atualização de idiomas não resolve as questões de publicação de LEGAL.md.
+Ao relatar um problema, informe versão do jogo, GPU, driver, resolução e modo.
+Revise os logs para remover caminhos pessoais antes de compartilhar. Não publique
+saves nem dumps de memória. Leia VALIDACION.txt para o alcance dos testes.
+
+Grounded DLSS isn't endorsed by Obsidian Entertainment, Inc. and doesn't reflect
+the views or opinions of Obsidian Entertainment, Inc. or anyone officially involved
+with making Grounded. Grounded and Obsidian Entertainment and all related logos
+are trademarks or registered trademarks of Obsidian Entertainment, Inc.

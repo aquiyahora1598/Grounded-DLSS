@@ -1,0 +1,70 @@
+GROUNDED DLSS - TERMS OF USE AND EXTERNAL COMPONENTS
+October 21, 2026
+
+BETA STATUS
+This package is a beta with license and trademark review pending. See the
+open questions in LEGAL.md. It does not represent approval by NVIDIA,
+Obsidian, Microsoft or Valve. It is free, experimental and unofficial.
+This translation is provided for convenience; the Spanish original is
+available as TERMINOS.txt. NVIDIA's original English license governs its
+components and is not replaced by this document.
+
+ORIGINAL PROJECT CODE
+The project's original code is offered under the MIT license in LICENSE.txt.
+These terms do not reduce the MIT permissions for that code. MIT does not
+grant rights to third-party components or trademarks. No payment, account,
+telemetry or submission of saves is required.
+
+NVIDIA DLL AND SDK
+The package contains no nvngx_dlss.dll, drivers or SDK headers. The mod only
+uses production x64 DLSS SR libraries present in local NVIDIA components,
+with valid Authenticode signatures. It compares versions and checks the
+declared minimum driver. NGX determines final availability. There is no
+library download, manual DLL picker or private DLSS fallback library.
+The original NVIDIA cache is not modified. A single working copy is prepared
+for NGX loading; it is not a source if the local NVIDIA library disappears.
+Libraries are not searched for in other games or executed to verify identity.
+
+The DLL and SDK retain their original terms. Before installing, read
+NVIDIA-RTX-SDK-LICENSE.txt, included in full for reference. NVIDIA's English
+text governs its components; this summary neither replaces it nor grants
+an additional sublicense. Obtaining the DLL separately does not remove the
+obligations of an application incorporating or based on the SDK.
+
+In particular, NVIDIA components are subject to compatible NVIDIA GPU use;
+no SDK reverse engineering, decompilation or disassembly except as mandatory
+applicable law permits; no removal of ownership notices, circumvention of
+protections or standalone SDK distribution outside NVIDIA's authorization.
+There is no right to apply the mod's MIT license to those components, use
+trademarks or claim official endorsement. Applicable export controls and
+legal restrictions remain in force. If you cannot accept the applicable
+conditions, do not install those components.
+
+GAME AND TRADEMARKS
+You need your own legitimate, compatible copy of Grounded. The mod grants no
+rights to the game, its assets or trademarks. You must comply with applicable
+Grounded and Steam terms, subject to exceptions established by law. No game
+assets or features to bypass DRM or authentication are included. No specific
+publisher authorization for this integration has been obtained.
+
+Grounded DLSS isn't endorsed by Obsidian Entertainment, Inc. and doesn't reflect
+the views or opinions of Obsidian Entertainment, Inc. or anyone officially involved
+with making Grounded. Grounded and Obsidian Entertainment and all related logos
+are trademarks or registered trademarks of Obsidian Entertainment, Inc.
+
+RISKS, DATA AND UNINSTALL
+Provided without warranty, subject to rights that cannot legally be excluded.
+Back up your saves and close the game before installing or uninstalling.
+Performance, image quality at every scale and universal compatibility are
+not guaranteed. Installation changes the mod's own files and the settings
+described in LEEME.en.txt. User-modified files are preserved on uninstall.
+Local logs may contain file paths; review them before sharing.
+If no compatible NVIDIA source is found, installation stops without changing
+the game. The installer and local selection do not download DLSS. NVIDIA's
+own infrastructure may manage components according to its settings and terms;
+the mod does not change those settings or request updates.
+
+Uninstall removes the valid, owned working copy. Unrelated or altered files
+are preserved. Configuration backups allow previous settings to be restored
+and remain separate from the working library. No new license acceptance is
+required to uninstall or recover an operation.

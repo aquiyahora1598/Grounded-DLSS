@@ -1,0 +1,46 @@
+{
+  "status": "private-review-only",
+  "distribution": "free-installer-and-source",
+  "own_code_license": "MIT",
+  "checks": {
+    "own_ngx_project_id_verified": {
+      "complete": true,
+      "evidence": "Own GUID d91874f0-6893-4ba7-ae47-a9b3384f7530; isolated GPU tests in five modes at 1080p, 1440p and 4K. See evidence/2026-10-20/legal-review/project-id-public-runtime.json. Game-session validation on 2026-10-20: 8226 successful evaluations at 1080p Performance and F8 round trip; evidence/2026-10-20/local-cache-game/result.json."
+    },
+    "nvidia_sdk_notification_applicability_resolved": {
+      "complete": false,
+      "evidence": ""
+    },
+    "nvidia_attribution_and_trademark_requirements_resolved": {
+      "complete": false,
+      "evidence": ""
+    },
+    "grounded_steam_terms_and_compatibility_signatures_reviewed": {
+      "complete": false,
+      "evidence": ""
+    },
+    "publisher_identity_and_build_tool_licensing_confirmed": {
+      "complete": false,
+      "evidence": ""
+    },
+    "existing_system_cache_gpu_verified": {
+      "complete": true,
+      "evidence": "Read-only NVIDIA NGX cache 310.9.16: backend and actual ASI tests in five modes at 1080p, 1440p and 4K. Cached 310.9.0 and 310.6.0 also pass backend 1440p. See evidence/2026-10-20/system-runtime. These earlier tests were isolated. Subsequently installed the cached 310.9.16 copy in Grounded and verified real gameplay evaluation plus NVIDIA indicator. No download used for game installation; cache unchanged."
+    },
+    "dynamic_local_nvidia_runtime_selection_verified": {
+      "complete": true,
+      "evidence": "11.22.0 uses NVIDIA Authenticode production identity and numeric local version ordering, no local version hash allowlist. Native ownership/minimum-driver/tampering tests, actual ASI upgrade 310.9.1 -> 310.9.16 GPU evaluations in five modes at three outputs, installer regressions and real Grounded session with 9812 successful evaluations passed. See evidence/2026-10-20/dynamic-local-runtime. Publication requirements remain unresolved."
+    },
+    "local_only_no_download_no_backup_verified": {
+      "complete": true,
+      "evidence": "11.23.0 removes the downloader, manual DLL selection and installed fallback library. Native missing-source tests reject private fallback and retire stale owned working files. Installer update removes only recorded unchanged legacy library; eight owned payload files contain no NVIDIA runtime. GPU evaluations at three outputs pass without an initial library. See evidence/2026-10-20/local-only-runtime. Legal publication requirements remain unresolved."
+    }
+  },
+  "note": "Removing the DLL does not waive SDK terms. Do not mark complete without documented resolution. No notification or legal request has been sent. Optional official download does not clear SDK/branding/game publication requirements.",
+  "retired_checks": {
+    "official_download_safety_tested": {
+      "applies_to": "11.21.4 to 11.22.0 only",
+      "evidence": "11.23 removed the downloader and manual DLL selection; there is no download path left to test in the current package. Historical record: Pinned public NVIDIA/DLSS HTTPS file; explicit consent, cancellation, exact size/SHA256, offline failure cases and live isolated install/uninstall passed. Does not clear other publication requirements. Updated pinned official fallback to 310.9.16; signed NVIDIA file, identical SDK license, live isolated download/install/uninstall passed."
+    }
+  }
+}

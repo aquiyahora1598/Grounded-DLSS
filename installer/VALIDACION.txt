@@ -1,0 +1,291 @@
+VALIDACION 11.23.4 - INSTALADOR EN TRES IDIOMAS, 21/10/2026
+
+Interfaz, errores y registros en espanol, ingles y portugues de Brasil.
+Seleccion inicial segun Windows y selector manual. Cambiar idioma conserva
+la carpeta y desmarca el consentimiento; no cambia opciones ni archivos.
+Ayuda y terminos propios traducidos, con licencias NVIDIA y MIT originales.
+La instalacion incluye los documentos de los tres idiomas para consulta.
+
+tests/installer_languages.cs cubre deteccion, traducciones, cambio en vivo,
+consentimiento, documentos, texto NVIDIA sin alteraciones, renders de los tres
+idiomas y recorrido de instalacion/desinstalacion con FSR y logs traducidos.
+Se conservan las 16 regresiones de FSR y las regresiones anteriores.
+Evidencia: evidence/2026-10-21/installer-languages/installer/verification.json.
+El runtime sigue siendo el ASI 11.23.2 exacto: no es una nueva prueba de FPS.
+
+VALIDACION 11.23.3 - FSR APAGADO AL INSTALAR, 21/10/2026
+
+Cambio exclusivo del instalador; se conserva el ASI 11.23.2 con SHA-256:
+1ec7706332eb03f2cee4d1cc03abfa23c38f432576b31b8ecf12209558f3412e.
+La evidencia GPU exacta de ese ASI sigue en audit-fixes/gpu-result.json.
+No se afirma una nueva prueba visual ni un benchmark por este cambio.
+
+Al instalar o actualizar, solo FSRQualityLevel en la seccion del juego pasa
+a cero. Resolucion, escala y otros ajustes del menu se conservan. Se registra
+la preferencia anterior para desinstalar; los cambios posteriores del usuario
+se preservan. Las instalaciones anteriores migran al estado formato 3, que
+los instaladores viejos rechazan para no perder la restauracion de FSR.
+
+Regresiones especificas en tests/installer_fsr.cs: instalacion desde FSR activo,
+restauracion exacta, ajustes editados, primera ejecucion, duplicados y secciones,
+UTF-8/UTF-16, actualizacion, migracion, rollback, recuperacion y respaldo danado.
+La revision del paquete usa este grupo ademas de los cuatro grupos anteriores.
+Evidencia local: evidence/2026-10-21/auto-fsr/installer/verification.json.
+
+VALIDACION 11.23.2 - DLSS VUELVE A ACUMULAR HISTORIAL, 21/10/2026
+
+Con 11.23.1, el usuario vio peor la imagen con DLSS. El log de su partida a
+1080p en Rendimiento mostro 2008 pases temporales con pipeline no clasificado
+frente a 667 evaluaciones DLSS. 11.23.1 reiniciaba el historial DLSS en cada
+uno, asi que DLSS casi no acumulaba fotogramas. En 11.23.2 esos pases solo se
+cuentan (native_unclassified) y el historial se conserva, como en 11.23.0. El
+tiempo entre fotogramas que recibe NGX vuelve al valor fijo de 16,67 ms de
+11.23.0 hasta probarlo por separado. El resto de las correcciones de 11.23.1
+sigue igual, incluido Ultra al 33,32 %. Queda abierto el riesgo R4: NGX no
+recibe los cortes de camara.
+
+Se repitieron la compilacion de los 14 objetivos, las pruebas unitarias y del
+cargador, las pruebas GPU del ASI nuevo por descriptores y por el puente nativo
+a 1080p, 1440p y 4K, la nitidez por modo, el redondeo de Ultra, las regresiones
+del instalador y la revision de publicacion. Todo paso. Falta la confirmacion
+visual del usuario en el juego.
+
+Las secciones 11.23.1 siguientes describen esa version; lo indicado arriba
+reemplaza su reinicio de historial y su tiempo entre fotogramas.
+
+CONFIRMACION EN LA PC DEL USUARIO - 11.23.1, 21/10/2026
+Se instalo 11.23.1 con el instalador grafico y los archivos instalados coinciden
+con el paquete. En Grounded a 1080p, DLSS quedo activo en Rendimiento (960x540,
+preset M), Ultra Rendimiento (640x360, L), Calidad (1287x724, K) y DLAA (K).
+En pantalla completa del juego a 2560x1440, Ultra Rendimiento preparo 853x480
+sin remuestreo, con preset L, 8700 evaluaciones y failed=0. F8 paso al escalado
+de Unreal y regreso a DLSS en ambas resoluciones. 4K no se probo en el juego.
+No es una comparacion de FPS ni una matriz visual.
+
+Al salir al escritorio, Grounded cerro con el fallo conocido del propio juego:
+escritura en Maine-Win64-Shipping.exe+0xa80ab5 y un segundo fallo dentro de su
+gestor de errores. Los dos volcados de 11.23.1 y cuatro anteriores son iguales al
+del juego limpio sin mods (evidence/2026-10-08/component-clean-v11-13). Las
+instancias que solo llegaron al menu cerraron sin volcado. Partidas y ajustes
+se respaldaron antes y se restauraron despues, verificados por SHA-256.
+
+Observacion: en la sesion a 1440p se contaron 59 pases temporales con pipeline
+no clasificado (native_unclassified); cada uno reinicia el historial DLSS. Falta
+confirmar si coinciden con cortes de camara o carga de escena.
+
+VALIDACION 11.23.1 - CORRECCIONES DE LA AUDITORIA DEL 21/10/2026
+
+Runtime: al cerrar el proceso no quedan bloqueos ni se libera estado que todavia
+usan los ganchos D3D12; la carga en paralelo del ASI no pierde la creacion del
+dispositivo; DLSS recibe el tiempo real entre fotogramas y reinicia su historial
+tras un corte de camara o un pase temporal con pipeline no clasificado; la cola
+nativa descarta entradas muertas; el registro tiene tamano acotado; la copia de
+trabajo DLSS se verifica antes de cargarla, NGX se valida y se avisa cuando se
+usa la ruta alternativa. Ultra Rendimiento usa 33,32 %: a 1440p Unreal prepara
+853x480 y DLSS ya no remuestrea la entrada antes de escalar.
+
+Instalador: un diario de transacciones cortado en la ultima linea ya no bloquea
+la recuperacion. Engine.ini acepta "clave = valor", conserva UTF-16 y finales de
+linea, agrega claves nuevas al final de su seccion y no reescribe el archivo si
+ya tiene los valores. La revision de publicacion exige la evidencia GPU del ASI
+exacto en vez de omitirla.
+
+Pruebas: 14 objetivos compilados (el banco GPU tenia un aviso C4456, corregido
+en 11.23.2); pruebas unitarias y del cargador,
+incluida la capa de compatibilidad de Windows. Pruebas GPU del ASI exacto por
+descriptores y por el puente nativo que usa el juego, a 1080p, 1440p y 4K, con
+20 fotogramas por caso y sin errores D3D12 (capa de depuracion no disponible).
+Tambien se probaron la nitidez por modo en el puente nativo y el redondeo de
+Ultra. Pasaron todas las regresiones del instalador y la revision de publicacion.
+
+Las secciones 11.23.0 siguientes siguen vigentes salvo lo indicado arriba.
+
+CONFIRMACION EN LA PC DEL USUARIO - 11.23.0
+Se actualizo la instalacion real sin copiar ni descargar una biblioteca NVIDIA.
+La DLL privada de respaldo anterior fue retirada. Al iniciar Grounded, el mod
+detecto la 310.9.16 desde la cache NVIDIA y genero solo su copia de trabajo.
+En una partida a 1080p, Rendimiento (960x540), el indicador NVIDIA confirmo esa
+version; se observaron mas de 4200 evaluaciones correctas con failed=0. F8 paso
+al escalado de Unreal y regreso a DLSS. Se dejo el juego pausado con DLSS activo.
+La fuente de cache conserva su hash y fecha. No es una comparacion de FPS.
+
+VALIDACION 11.23.0 - FUENTE NVIDIA LOCAL SIN DESCARGA NI RESPALDO DLSS
+
+Se retiraron el descargador, selector manual y DLL privada de respaldo.
+El ASI exacto paso pruebas GPU en 1080p, 1440p y 4K partiendo solo de los archivos
+propios del mod: no habia una biblioteca inicial ni de respaldo. En cada proceso
+se detecto 310.9.16 de la cache NVIDIA y se preparo su unica copia de trabajo.
+Se evaluaron cinco modos y 20 fotogramas por salida, 60 en total, con retorno
+al pase de Unreal mediante la API de prueba. No se notificaron errores D3D12;
+la capa de depuracion no estaba disponible. No es una matriz visual en el juego.
+
+La prueba nativa verifico que, al faltar la fuente NVIDIA, ni la antigua DLL
+privada ni la copia de trabajo sirven como respaldo. La copia de trabajo propia
+se retira cuando la fuente desaparece. Se rechazaron binarios alterados y un
+controlador inferior al minimo declarado. La cache original no se modifico.
+
+Las regresiones del instalador pasaron: no existe descargador ni importador de
+DLL, se instala sin copiar bibliotecas NVIDIA, se retira solo la antigua copia
+registrada sin cambios y se preservan archivos modificados o ajenos. Se mantienen
+restauracion de configuracion, recuperacion de transacciones y desinstalacion.
+
+Las revisiones historicas siguientes describen sus propias funciones y pruebas;
+las descargas y respaldos DLSS que mencionan ya no forman parte de 11.23.0.
+
+HISTORICO
+
+VALIDACION ACTUAL 11.22.0 - SELECCION LOCAL DINAMICA, 20/10/2026
+La busqueda local dejo de depender de hashes y nombres de versiones fijados.
+Se verifican firma Authenticode NVIDIA, produccion DLSS SR x64, version numerica
+y controlador minimo declarado, y NGX confirma disponibilidad en la GPU.
+
+Pruebas aisladas del ASI exacto: 60 fotogramas GPU en 1080p, 1440p y 4K,
+cinco modos por salida y retorno al pase Unreal mediante la API de prueba.
+Con una copia inicial 310.9.1 se eligio la 310.9.16 local de NVIDIA y se creo
+una copia automatica propia. La copia inicial no cambio. Se probaron nombres
+de carpetas no previstos, persistencia tras limpiar la cache de prueba,
+rechazo de un binario alterado, controlador minimo y archivos ajenos.
+No se notificaron errores D3D12; la capa de depuracion no estaba disponible.
+El preset pedido no acredita por si solo el modelo aplicado por NVIDIA.
+
+Dentro de Grounded Steam 1.4.7.4815, DX12, RTX 4070 Laptop y driver 617.42:
+- Seleccion automatica sin archivo manual ni descarga: 310.9.16.0.
+- Indicador NVIDIA: DLSS v310.9.16 (nvapp_override), Performance, 960x540->1080p.
+- Se observaron 9812 evaluaciones correctas y failed=0.
+- La cache original NVIDIA conserva su huella y fecha de modificacion.
+- Partida dejada en pausa, DLSS activado, nitidez desactivada.
+No es una nueva comparacion de FPS ni la matriz visual completa dentro del juego.
+
+Instalacion/desinstalacion y recuperacion pasaron sus regresiones, incluida la
+limpieza de la copia automatica propia sin borrar archivos ajenos o alterados.
+La descarga opcional mantiene sus pruebas de permiso, cancelacion, tamano y
+SHA-256. El codigo de renderizado y el cargador no cambiaron en esta revision,
+salvo la identificacion de version y la seleccion de la biblioteca local.
+El instalador y las fuentes siguen excluyendo las DLL NVIDIA y OptiScaler.
+Estos resultados tecnicos no resuelven los pendientes legales de publicacion.
+
+HISTORICO DE REVISIONES ANTERIORES
+
+VALIDACION ACTUAL - INSTALADOR 11.21.5, 20/10/2026
+Se instalo el ASI 11.21.2 con identificacion NGX propia en Grounded Steam
+1.4.7.4815, DirectX 12, RTX 4070 Laptop. Se copio la biblioteca ya existente en
+la cache NVIDIA 310.9.16.0 sin descargar otra biblioteca para esta instalacion.
+La fuente original de cache conserva su huella y fecha de modificacion.
+Dentro de una partida, NVIDIA mostro DLSS v310.9.16 (nvapp_override), modo
+Rendimiento, 960x540 -> 1920x1080. Se observaron 8226 reconstrucciones correctas,
+sin fallo de inicializacion, y F8 cambio a Unreal y regreso a DLSS.
+No es una medicion comparativa de FPS ni una nueva matriz de todas las
+resoluciones. Se conservaron nitidez desactivada y la configuracion del usuario.
+
+La descarga opcional se actualizo a la publicacion oficial 310.9.16 (commit
+9981c6350dc58c0ce21f024fd65e31e851c31689), ultima comprobada al 20/10/2026.
+Firma Authenticode NVIDIA valida. La licencia coincide byte por byte con la
+version anterior. Una prueba separada del instalador descargo 58956912 bytes,
+verifico SHA-256 y completo instalacion y desinstalacion aisladas. Rechazo,
+cancelacion, tamanos inesperados y contenido dañado se probaron sin red.
+No se incluye ninguna biblioteca NVIDIA en el instalador ni las fuentes.
+
+HISTORICO (su alcance y huellas corresponden a cada revision indicada)
+
+GROUNDED DLSS 11.21.5 BETA - ALCANCE DE LAS PRUEBAS
+17 de octubre de 2026
+
+Revisión del instalador: 18 de octubre de 2026. Los binarios de aquella revision mantienen las huellas historicas indicadas. No se atribuyen nuevas
+pruebas visuales a esta revisión. Se añadieron regresiones para desinstalación
+repetida, respaldo dañado, copia propia abierta, recuperación sin cambios
+parciales, archivos temporales interrumpidos y modos de comparación desactivados.
+También se verifica que actualizar y desinstalar después conserve los ajustes
+editados por el usuario entre ambas operaciones.
+
+Probado dentro de Grounded Steam 1.4.7.4815, DirectX 12 y una GPU RTX 40:
+- Carga del mundo con el cargador propio, sin OptiScaler ni fakenvapi cargados.
+- DLL oficial de NVIDIA 310.9.1 desde la carpeta privada del mod.
+- Salida real de 1920x1080: Ultra Rendimiento, DLAA y Calidad.
+- Alternancia F8 y regreso a DLSS; más de 12000 evaluaciones sin errores NGX.
+- Escala elegida en 68 redondeada a 67 antes de reconstruir la imagen.
+- Nitidez desactivada y profundidad de campo en Bajo.
+
+La interpolación nativa de enfoque dependía de la cantidad de actualizaciones:
+con más FPS aceleraba la transición. Se reemplazó el factor fijo por uno basado
+en tiempo real. La curva corregida midió 0,25031 segundos para 0,25 configurados.
+La diferencia espacial percibida del desenfoque sigue pendiente de validación
+visual; no se presenta esta beta como una corrección completa de ese aspecto.
+
+El cargador pasó pruebas de importación temprana D3D11 y compatibilidad Windows
+antes de DllMain, nombres/ordinales DXGI, concurrencia y aislamiento del host.
+La prueba de compatibilidad reproduce el fallo anterior y pasa con la corrección.
+
+La instalación y desinstalación se comprobaron en archivos aislados y sobre la
+instalación local, incluyendo restauración de configuración, recuperación de
+fallos y conservación de archivos modificados y ajustes ajenos.
+
+Las pruebas anteriores de resoluciones del motor (1080p, 1440p y 4K, entre otras)
+corresponden a v11.20. No se repitió esa matriz completa con el nuevo cargador y
+la DLL NVIDIA 310.9.1. No se garantiza paridad de FPS, compatibilidad con todos
+los equipos ni ausencia de fallos de cierre. Ultra puede verse muy blando.
+
+Binarios de esta validación (SHA256):
+GroundedDLSS.asi
+2a9ed5fd737610280ffc42d629b086d1738464b574b826f0e34a94fdbb3f1583
+dxgi.dll
+37e88924030178e3f2b46a0db882d873b5ec950d2103bdb7f82976a7d3749ae5
+nvngx_dlss.dll
+3975567b8943c53acce397f2b72380092f84f162d00b0d2c7d08a1025c563983
+
+Ver LEEME.txt para requisitos, instalación, controles y desinstalación.
+
+20 de octubre: empaquetado sin DLL NVIDIA; importación local con SHA-256.
+El cargador conserva la huella anterior; la integracion cambia solo la
+identificacion NGX y el texto de version, segun la seccion siguiente.
+No se repitió la matriz visual para esta revisión del instalador.
+Las pruebas automáticas de esta revisión se documentan en LEGAL.md.
+
+CANDIDATO 11.21.2 - IDENTIFICACION PROPIA, 20 DE OCTUBRE
+Se retiro el ID numerico 608699473, sin constancia de asignacion a este proyecto.
+GUID propio: d91874f0-6893-4ba7-ae47-a9b3384f7530; tipo CUSTOM.
+GPU real: RTX 4070 Laptop. El backend verifico la evaluacion NVIDIA y los cinco
+modos a 1440p. El ASI candidato exacto paso 60 fotogramas en pruebas aisladas:
+20 en 1080p, 20 en 1440p y 20 en 4K, alternando los cinco modos y F8 simulado
+mediante la API de prueba. Se verificaron 20 reemplazos por salida y presets K/M/L.
+No se notificaron errores D3D12; la capa de depuracion no estaba disponible.
+Estos resultados no equivalen a una sesion visual completa dentro del juego.
+Un primer intento del arnes no encontro la DLL junto al ASI de prueba; se
+corrigio la carpeta aislada y las tres resoluciones pasaron. El caso se conserva
+en la evidencia privada. No se modifico la instalacion real del usuario.
+
+SHA256 del ASI candidato 11.21.2:
+7faf9f975ec50502248009e9c9931a09a9e0f4401c7abdb05fb118b6e2b2f6d1
+
+INSTALADOR 11.21.3 - COPIA DLSS EXISTENTE EN NVIDIA NGX
+Sin una biblioteca local, el backend nativo fallo con DLSS no disponible.
+La cache NVIDIA contenia bibliotecas con firma valida, verificadas sin descargarlas.
+310.9.16: pruebas GPU aisladas del backend y ASI real a 1080p, 1440p y 4K,
+cinco modos y 20 fotogramas por salida (60 backend y 60 ASI). Se verifico
+la evaluacion NVIDIA en el backend, y 20 reemplazos por salida en el ASI.
+310.9.0 y 310.6.0: cinco modos, 20 fotogramas por version a 1440p en el backend.
+No hubo errores D3D12 notificados; la capa de depuracion no estaba disponible.
+La prueba sin biblioteca no ejecuto DLSS. No se interpreto el TAA original como
+prueba exitosa. No se toco el juego ni la cache original y no hubo descarga
+explicita. Estas son pruebas GPU aisladas; la sesion visual queda pendiente.
+El ASI y el cargador conservan las huellas del candidato anterior 11.21.2.
+
+INSTALADOR 11.21.4 - DESCARGA OFICIAL OPCIONAL
+Si no existe una copia compatible, se avisa y pide permiso antes de conectar
+al archivo de produccion fijado en NVIDIA/DLSS. Se muestran progreso y cancelacion.
+Pruebas aisladas cubren rechazo, cancelacion antes/durante, contenido truncado,
+exceso de bytes, hash incorrecto, prevalidacion del juego e instalacion y
+desinstalacion posteriores a una descarga validada. El archivo no esta integrado
+en el instalador ni se carga para validarlo.
+
+API NGX administrada: sin DLL local ni rutas adicionales, NGX inicio, pero DLSS
+no estuvo disponible. UpdateFeature devolvio exito, sin conseguir que estuviera
+disponible tras volver a iniciar NGX y comprobar mas tarde. No se presenta como
+un sustituto fiable de la biblioteca local en esta integracion.
+
+Descarga real del instalador 11.21.4: 58.956.912 bytes desde el archivo
+oficial fijado de NVIDIA/DLSS, SHA-256 correcto, progreso al 100 %, una
+aprobacion y una solicitud; instalacion/desinstalacion aisladas exitosas.
+Los registros NGX mostraron seleccion de 310.9.16 desde la cache NVIDIA
+incluso al aportar 310.9.1 como base. Bajo la configuracion global K, el
+controlador confirmo K en las pruebas aisladas: K/M/L solicitados por el mod
+no se presentan como los tres modelos efectivamente ejecutados en ese banco.

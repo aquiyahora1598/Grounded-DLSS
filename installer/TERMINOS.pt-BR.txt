@@ -1,0 +1,72 @@
+GROUNDED DLSS - TERMOS DE USO E COMPONENTES EXTERNOS
+21 de outubro de 2026
+
+ESTADO DA BETA
+Este pacote é uma beta com revisão de licenças e marcas pendente. Consulte
+as questões abertas em LEGAL.md. Ele não representa aprovação da NVIDIA,
+Obsidian, Microsoft ou Valve. É gratuito, experimental e não oficial.
+Esta tradução é fornecida para facilitar a leitura; o original em espanhol
+está em TERMINOS.txt. A licença original da NVIDIA em inglês rege seus
+componentes e não é substituída por este documento.
+
+CÓDIGO PRÓPRIO
+O código original do projeto é oferecido sob a licença MIT em LICENSE.txt.
+Estes termos não reduzem as permissões MIT desse código. A MIT não concede
+direitos sobre componentes ou marcas de terceiros. Não é necessário pagar,
+criar uma conta, enviar telemetria ou compartilhar saves.
+
+DLL E SDK DA NVIDIA
+O pacote não contém nvngx_dlss.dll, drivers ou cabeçalhos do SDK. O mod usa
+apenas bibliotecas DLSS SR x64 de produção presentes nos componentes locais
+da NVIDIA, com assinaturas Authenticode válidas. Compara versões e verifica
+o driver mínimo declarado. O NGX determina a disponibilidade final. Não há
+download de bibliotecas, seletor manual de DLL nem biblioteca privada de reserva.
+O cache original da NVIDIA não é alterado. É preparada uma única cópia de
+trabalho para o carregamento pelo NGX; ela não é usada como fonte se a
+biblioteca local da NVIDIA desaparecer. Não são procuradas DLLs em outros
+jogos nem executadas bibliotecas para verificar sua identidade.
+
+A DLL e o SDK mantêm seus termos originais. Antes de instalar, leia
+NVIDIA-RTX-SDK-LICENSE.txt, incluído integralmente para consulta. O texto em
+inglês da NVIDIA rege seus componentes; este resumo não o substitui nem
+concede uma sublicença adicional. Obter a DLL separadamente não elimina as
+obrigações de um aplicativo que incorpora ou se baseia no SDK.
+
+Em particular, os componentes da NVIDIA estão sujeitos ao uso com uma GPU
+NVIDIA compatível; sem engenharia reversa, descompilação ou desmontagem do SDK,
+exceto quando a lei aplicável permitir obrigatoriamente; sem remover avisos
+de propriedade, contornar proteções ou distribuir o SDK isoladamente fora do
+que a NVIDIA autoriza. Não é concedido o direito de aplicar a licença MIT do
+mod a esses componentes, usar marcas ou alegar apoio oficial. Permanecem os
+controles de exportação e restrições legais aplicáveis. Se você não puder
+aceitar as condições aplicáveis, não instale esses componentes.
+
+JOGO E MARCAS
+Você precisa de sua própria cópia legítima e compatível do Grounded. O mod
+não concede direitos sobre o jogo, seus recursos ou suas marcas. Você deve
+cumprir os termos aplicáveis do Grounded e da Steam, com as exceções previstas
+em lei. Não são incluídos recursos do jogo nem funções para contornar DRM ou
+autenticação. Não foi obtida autorização específica da editora para esta integração.
+
+Grounded DLSS isn't endorsed by Obsidian Entertainment, Inc. and doesn't reflect
+the views or opinions of Obsidian Entertainment, Inc. or anyone officially involved
+with making Grounded. Grounded and Obsidian Entertainment and all related logos
+are trademarks or registered trademarks of Obsidian Entertainment, Inc.
+
+RISCOS, DADOS E DESINSTALAÇÃO
+Fornecido sem garantia, sujeito aos direitos que não possam ser excluídos por
+lei. Faça backup dos saves e feche o jogo antes de instalar ou desinstalar.
+Não são garantidos desempenho, qualidade em todas as escalas ou compatibilidade
+universal. A instalação altera os arquivos próprios do mod e as configurações
+descritas em LEEME.pt-BR.txt. Arquivos modificados pelo usuário são preservados
+na desinstalação. Os logs locais podem conter caminhos de arquivos; revise-os
+antes de compartilhar.
+Se não houver uma fonte NVIDIA compatível, a instalação para sem alterar o
+jogo. O instalador e essa seleção local não baixam o DLSS. A infraestrutura
+da NVIDIA pode gerenciar componentes conforme suas configurações e condições;
+o mod não altera essas configurações nem solicita atualizações.
+
+A desinstalação remove a cópia de trabalho própria e válida. Arquivos de
+terceiros ou alterados são preservados. Os backups de configuração permitem
+restaurar os ajustes anteriores e ficam separados da biblioteca de trabalho.
+Não é necessário aceitar uma nova licença para desinstalar ou recuperar uma operação.
