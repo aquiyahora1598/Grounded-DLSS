@@ -3,8 +3,9 @@ from pathlib import Path
 import argparse, hashlib, json, subprocess, zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSION = '11.23.4-beta'
-RUNTIME_VERSION = '11.23.2-beta'  # Installer-only change; retain the audited ASI.
+VERSION = '11.24.0-beta'
+RUNTIME_VERSION = '11.24.0-beta'
+RUNTIME_TARGET = 'dlss-fsr-framegen'
 
 def sha(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
@@ -27,9 +28,19 @@ def main():
     prefix = 'Maine/Binaries/Win64/'
     files = {
         prefix + 'dxgi.dll': ROOT / 'build/loader/dxgi.dll',
-        prefix + 'plugins/GroundedDLSS.asi': ROOT / 'build/dlss/GroundedDLSS.asi',
+        prefix + 'plugins/GroundedDLSS.asi': ROOT / ('build/' + RUNTIME_TARGET + '/GroundedDLSS.asi'),
         prefix + 'plugins/GroundedDLSS.ini': ROOT / 'installer/GroundedDLSS.ini',
     }
+    sdk = ROOT / 'external/framegen/fsr-2.3.0/Kits/FidelityFX/signedbin'
+    amd = {
+        'amd_fidelityfx_loader_dx12.dll': 'e2d85aa05a9bd9ed8b38935fdf5199372cca6f74c12015143bb6f945ee1608aa',
+        'amd_fidelityfx_framegeneration_dx12.dll': '02297beedd285e822d3a64f314cf00faf378dcec0edc47ff0c4dd71b3a8c2f18',
+    }
+    for name, digest in amd.items():
+        source = sdk / name
+        if sha(source) != digest:
+            raise RuntimeError('AMD signed SDK binary differs: ' + name)
+        files[prefix + 'plugins/FSRFrameGeneration/' + name] = source
     documents = {
         'LEEME.txt': ROOT / 'installer/LEEME.txt',
         'NVIDIA-RTX-SDK-LICENSE.txt': ROOT / 'licenses/NVIDIA-RTX-SDK-LICENSE.txt',
@@ -40,6 +51,7 @@ def main():
         'LEEME.pt-BR.txt': ROOT / 'installer/LEEME.pt-BR.txt',
         'TERMINOS.en.txt': ROOT / 'installer/TERMINOS.en.txt',
         'TERMINOS.pt-BR.txt': ROOT / 'installer/TERMINOS.pt-BR.txt',
+        'AMD-FidelityFX-SDK-LICENSE.txt': ROOT / 'licenses/AMD-FidelityFX-SDK-LICENSE.txt',
     }
     for name, source in documents.items():
         files[prefix + 'GroundedDLSS-install/' + name] = source
@@ -63,6 +75,9 @@ def main():
         'installer_languages': ['es', 'en', 'pt-BR'],
         'publication_status': 'cleared' if args.public else 'private-review-only',
         'optiscaler_included': False, 'nvidia_runtime_included': False,
+        'frame_generation': {'provider': 'AMD FSR 3.1.6 analytical', 'swapchain': '3.1.7',
+                             'enabled_by_default': True, 'toggle': 'F9', 'sdr_only': True},
+        'dlss_toggle': 'F8', 'amd_binaries_included': amd,
         'nvidia_runtime_source': 'local NVIDIA NGX cache or active driver package only',
         'downloads_supported': False, 'backup_libraries_installed': False,
         'local_runtime_policy': 'newest signed production DLSS present at each game start; one working copy, never a private fallback',

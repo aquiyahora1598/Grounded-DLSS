@@ -45,7 +45,7 @@ class InstallerLanguageTests {
    string code=language;
    Case("language-help-terms-and-original-nvidia-"+code,()=>{
     I18n.SetLanguage(code);using(var view=SetupForm.CreateTermsView()){
-     var tabs=view.Controls.OfType<TabControl>().Single();Check(tabs.TabPages.Count==5,"Help or license tab missing");
+     var tabs=view.Controls.OfType<TabControl>().Single();Check(tabs.TabPages.Count==6,"Help or license tab missing");
      string help=((TextBox)tabs.TabPages[0].Controls[0]).Text,terms=((TextBox)tabs.TabPages[1].Controls[0]).Text,nvidia=((TextBox)tabs.TabPages[3].Controls[0]).Text;
      Check(help.Contains(code=="es"?"INSTALAR O ACTUALIZAR":code=="en"?"INSTALL OR UPDATE":"INSTALAR OU ATUALIZAR"),"Wrong help language");
      Check(terms.Contains(code=="es"?"CODIGO PROPIO":code=="en"?"ORIGINAL PROJECT CODE":"CÓDIGO PRÓPRIO"),"Wrong terms language");

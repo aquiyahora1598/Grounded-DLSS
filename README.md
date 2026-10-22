@@ -1,92 +1,101 @@
-# Grounded DLSS
+# Grounded DLSS + FSR Frame Generation
 
-**11.23.4 beta: revision de licencias y marcas pendiente.**
-Actualizacion del instalador; runtime DLSS 11.23.2 sin cambios.
+**11.24.0 Beta · Español / English / Português (Brasil)**
 
-Instalador en **espanol, English y portugues do Brasil**, con selector de idioma.
-[English help](installer/LEEME.en.txt) · [Ajuda em portugues do Brasil](installer/LEEME.pt-BR.txt).
+## F8 — DLSS / DLAA ON ↔ OFF
 
-Integracion no oficial para Grounded Steam 1.4.7.4815, Windows x64, DirectX 12 y
-NVIDIA RTX. Codigo propio MIT; los componentes NVIDIA conservan sus condiciones.
-No incluye DLL NVIDIA ni OptiScaler. No descarga DLSS ni conserva una biblioteca
-de respaldo. Necesita una fuente DLSS SR de produccion compatible en la cache
-NGX de NVIDIA o en el paquete activo de su controlador.
+## F9 — FSR FRAME GENERATION ON ↔ OFF
 
-En cada arranque elige la version local mas reciente admitida, valida la firma
-NVIDIA y comprueba el controlador minimo declarado. NGX confirma disponibilidad.
-Prepara una sola copia de trabajo para cargarla; esa copia no se usa como fuente
-si los componentes NVIDIA dejan de ofrecer la biblioteca. No modifica la cache
-NVIDIA, los perfiles del controlador ni las partidas. Reinicia el juego para
-adoptar una biblioteca que NVIDIA haya actualizado.
+**Español:** F8 activa/desactiva DLSS/DLAA. **F9 activa/desactiva FSR Frame Generation.**
+**English:** F8 enables/disables DLSS/DLAA. **F9 enables/disables FSR Frame Generation.**
+**Português:** F8 ativa/desativa DLSS/DLAA. **F9 ativa/desativa FSR Frame Generation.**
 
-## Instalar y usar
+Ambos inician activados / Both start enabled / Ambos iniciam ativados.
+Para comparar solo FG, usá F9 / Use F9 to compare FG alone / Use F9 para comparar somente o FG.
 
-Con Grounded cerrado, abri el instalador, elegi la carpeta Grounded, lee y acepta
-los terminos y licencias, y elegi Instalar / actualizar. Si falta DLSS local,
-avisa y no modifica la instalacion. El instalador deja FSR desactivado
-automaticamente y conserva su seleccion anterior. Inicia con DirectX 12.
-Si reactivas FSR en el menu, desactivalo para usar DLSS.
+> **FSR de AMD del menú: APAGADO.** Es otro escalador; el instalador lo desactiva.
+> Keep the in-game **AMD FSR upscaler OFF**. Deixe o **escalonamento FSR do menu DESATIVADO**.
+> Frame Generation se controla aparte con **F9**.
 
-| Escala del juego | Modo |
+Integración no oficial para Grounded Steam **1.4.7.4815**, Windows 10/11 x64,
+DirectX 12, NVIDIA RTX y salida **SDR**. DLSS reconstruye la imagen; AMD FSR 3.1.6
+analítico genera los cuadros intermedios con su presentación 3.1.7. Sin OptiScaler
+ni NVIDIA FG. Código propio MIT; dependencias bajo sus licencias originales.
+
+## Instalar / Install / Instalar
+
+Descargá **GroundedDLSS-11.24.0-beta-Setup.exe** de
+[Releases](https://github.com/aquiyahora1598/Grounded-DLSS/releases/tag/v11.24.0-beta).
+Con el juego cerrado, elegí idioma y carpeta Grounded, revisá los términos y
+seleccioná **Instalar / actualizar · Install / update · Instalar / atualizar**.
+Iniciá el juego con DirectX 12.
+
+Para desinstalar, cerrá Grounded y elegí **Desinstalar / Uninstall** en ese mismo
+EXE o en `Maine/Binaries/Win64/GroundedDLSS-install/Desinstalar Grounded DLSS.exe`.
+Retira los archivos AMD que instaló y conserva archivos modificados por el usuario.
+Restaura los ajustes propios sin perder otros cambios del juego.
+
+Incluye dos DLL oficiales AMD firmados y su licencia original. **No incluye ni
+descarga DLL NVIDIA.** En cada arranque busca el DLSS SR de producción compatible
+más nuevo que ya ofrezcan los componentes locales de NVIDIA, verifica su firma y
+controlador mínimo y prepara una copia de trabajo. Necesita esa fuente local;
+no usa una biblioteca privada de respaldo. No cambia la caché ni los perfiles NVIDIA.
+
+| Escala del juego | DLSS |
 |---|---|
 | 100 | DLAA |
-| 67 | Calidad |
-| 58 | Equilibrado |
-| 50 | Rendimiento |
-| 33 | Ultra Rendimiento |
+| 67 | Calidad / Quality / Qualidade |
+| 58 | Equilibrado / Balanced |
+| 50 | Rendimiento / Performance / Desempenho |
+| 33 | Ultra Rendimiento / Ultra Performance |
 
-La escala se ajusta al valor mas cercano. F8 alterna con el pase de Unreal.
-Nitidez desactivada. Ultra puede verse muy blando; la apariencia espacial de la
-profundidad de campo sigue en evaluacion. No se garantiza compatibilidad universal.
+Elige el nivel más cercano. Nitidez desactivada. F9 funciona con esos modos.
+Esta beta prepara FG en el pase DLSS: **F8 también suspende FG al apagar DLSS**;
+retoma al reactivar DLSS si F9 seguía encendido. En pausa, cargas y menús se suspende FG.
+Para iniciar sin FG, agregá `[FrameGeneration]` y `Enabled=0` al INI del mod.
 
-Para desinstalar, cerra el juego y elegi Desinstalar en el mismo instalador o en
-`Maine/Binaries/Win64/GroundedDLSS-install/Desinstalar Grounded DLSS.exe`.
-Se conservan cambios del usuario y respaldos de configuracion para restaurar sus
-ajustes, incluida la seleccion anterior de FSR. Si cambiaste FSR despues de
-instalar, se respeta esa nueva eleccion. Resolucion y otros ajustes del menu
-se conservan. La copia de trabajo propia y valida se elimina; la cache NVIDIA se conserva.
-Al actualizar se retira la biblioteca privada de versiones anteriores que siga
-coincidiendo con su registro. Los archivos modificados o ajenos se preservan.
+## Pruebas y límites
 
-Lee `installer/LEEME.txt`, `installer/TERMINOS.txt` y `LEGAL.md`.
+Probado dentro de Grounded en RTX 4070 Laptop a 1080p y 1440p; pausa/reanudación,
+F8/F9 y cambios de resolución. La presentación aislada pasó también a 4K.
+A 1440p con DLAA, una muestra corta pasó de unos 67 cuadros/s sin FG a 101
+presentaciones/s con FG (50 renderizados más los generados). Son contadores DXGI,
+no scanout o latencia ni una garantía para otras escenas. El usuario confirmó
+una prueba satisfactoria. Puede haber artefactos breves al entrar en pausa.
+Ultra puede perder detalle; HDR y compatibilidad universal no están validados.
+FG no duplica la respuesta de los controles. Esta versión es beta.
 
-## Compilar desde las fuentes
+[Español](installer/LEEME.txt) · [English](installer/LEEME.en.txt) ·
+[Português (Brasil)](installer/LEEME.pt-BR.txt).
 
-Necesitás Python 3.10 o posterior, Visual Studio Build Tools con C++ x64,
-Windows SDK y .NET Framework 4.x para el instalador. Usá herramientas con sus
-licencias correspondientes. No se redistribuyen compiladores ni SDK de Microsoft.
+## Compilar
 
-1. Leé `licenses/NVIDIA-RTX-SDK-LICENSE.txt`. Si aceptás sus términos, ejecutá
-   `python tools/fetch_sdk.py --accept-nvidia-sdk-license`. Descarga solo los
-   encabezados desde commits oficiales fijados y verifica cada SHA-256.
-2. Ejecutá `python tools/build.py loader` y `python tools/build.py dlss`.
-3. Ejecutá `python tools/build_release.py` para el instalador privado y
-   `python tools/build_source_release.py` para exportar las fuentes.
-4. `python tools/review_legal_release.py --runtime RUTA_DLSS_LOCAL` comprueba
-   ambos paquetes en archivos aislados. Usa una biblioteca ya presente en los
-   componentes NVIDIA; no abre el juego, no descarga DLL ni modifica una instalacion real.
+Python 3.10+, MSVC C++ x64, Windows SDK y .NET Framework 4.x:
 
-La opción `--public` queda bloqueada mientras los puntos de
-`publication/clearance.json` no estén resueltos con evidencia. Este control evita
-confundir un candidato técnico con una autorización legal; no sustituye esa revisión.
+1. Leé la licencia NVIDIA incluida. Si aceptás sus términos:
+   `python tools/fetch_sdk.py --accept-nvidia-sdk-license`.
+2. `python tools/fetch_framegen_sdks.py amd` obtiene y verifica el SDK oficial AMD fijado.
+3. `python tools/build.py loader` y `python tools/build.py dlss-fsr-framegen`.
+4. `python tools/build_release.py` y `python tools/build_source_release.py` generan candidatos.
 
-No subas la carpeta de investigación original: solo la exportación de fuentes.
-No incluyas `external`, capturas, shaders extraídos, volcados de memoria, partidas,
-rutas de usuarios, SDK privados, instaladores anteriores ni herramientas auxiliares.
+El control `--public` sigue exigiendo resolver con evidencia `publication/clearance.json`.
+Esta beta se comparte por solicitud expresa del autor, sin declarar resueltos los
+pendientes documentados en [LEGAL.md](LEGAL.md). No es aprobación de los fabricantes.
+No subas la carpeta de investigación: solo la exportación de fuentes.
 
-## Derechos y avisos
+## Avisos
 
 This software contains source code provided by NVIDIA Corporation.
 
-Los términos NVIDIA siguen aplicándose aunque su DLL se obtenga por separado.
-No se conceden derechos sobre Grounded ni sus firmas de compatibilidad bajo MIT.
-No se incluyen logos, archivos del juego ni funciones para eludir DRM o autenticación.
-El mod no está afiliado a NVIDIA, Obsidian, Xbox o Valve.
+[Licencia AMD original](licenses/AMD-FidelityFX-SDK-LICENSE.txt), incluyendo los términos
+de redistribución binaria y excepciones MIT para encabezados. La MIT del proyecto
+no cambia condiciones de NVIDIA, AMD ni derechos del juego. Sin afiliación con
+NVIDIA, AMD, Obsidian, Xbox o Valve.
 
 Grounded DLSS isn't endorsed by Obsidian Entertainment, Inc. and doesn't reflect
 the views or opinions of Obsidian Entertainment, Inc. or anyone officially involved
 with making Grounded. Grounded and Obsidian Entertainment and all related logos
 are trademarks or registered trademarks of Obsidian Entertainment, Inc.
 
-Antes de compartir registros revisá que no contengan rutas o datos personales.
-
+Revisá los registros antes de compartirlos: pueden contener rutas personales.
+No se publican partidas, capturas del juego ni volcados de memoria.

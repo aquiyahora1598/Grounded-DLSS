@@ -1,7 +1,7 @@
 """Verify private installer/source packages in isolated files. Never deploy or upload."""
 from pathlib import Path
 import argparse, datetime, hashlib, json, os, re, shutil, subprocess, sys, uuid, zipfile
-from build_release import ROOT, VERSION, sha
+from build_release import ROOT, VERSION, RUNTIME_TARGET, sha
 from build_source_release import source_files
 
 def main():
@@ -31,6 +31,7 @@ def main():
             ('installer_review', 'InstallerReviewTests', [str(release / 'payload.zip')]),
             ('installer_fsr', 'InstallerFsrTests', []),
             ('installer_languages', 'InstallerLanguageTests', []),
+            ('installer_framegen', 'InstallerFramegenTests', []),
             ('installer_runtime', 'InstallerRuntimeTests', [str(args.runtime)]),
             ('installer_cache', 'InstallerCacheTests', [str(args.cached_runtime or args.runtime), str(args.older_runtime or args.runtime)])]:
         target = work / (name + '.exe')
@@ -98,7 +99,8 @@ def main():
     checks['publication_gate_refuses_unresolved'] = True
     checks['embedded_payload_and_archive_checksums'] = True
     checks['source_allowlist_manifest_and_include_closure'] = True
-    checks['runtime_binary_sha256'] = sha(ROOT / 'build/dlss/GroundedDLSS.asi')
+    runtime_asi = ROOT / ('build/' + RUNTIME_TARGET + '/GroundedDLSS.asi')
+    checks['runtime_binary_sha256'] = sha(runtime_asi)
     checks['loader_binary_sha256'] = sha(ROOT / 'build/loader/dxgi.dll')
     # The previous release's runtime and loader are the tested unchanged binaries.
     prior = ROOT / 'dist/GroundedDLSS-11.21.1-beta/package-manifest.json'
@@ -108,15 +110,15 @@ def main():
         assert manifest['files'][loader] == old['files'][loader]
         checks['loader_unchanged_from_previous_release'] = True
     project_id = b'd91874f0-6893-4ba7-ae47-a9b3384f7530'
-    assert project_id in (ROOT / 'build/dlss/GroundedDLSS.asi').read_bytes()
+    assert project_id in runtime_asi.read_bytes()
     assert b'init(608699473' not in (ROOT / 'src/grounded/integration.cpp').read_bytes()
     checks['own_ngx_project_id_present_no_numeric_id_fallback'] = True
     # GPU evidence is required and must name this exact ASI. A missing or stale
     # record fails the review; it is never skipped silently.
-    dynamic = args.gpu_evidence
+    dynamic = args.gpu_evidence.resolve()
     assert dynamic.is_file(), ('GPU evidence missing', str(dynamic))
     dynamic_record = json.loads(dynamic.read_text(encoding='utf-8'))
-    assert dynamic_record['asi_sha256'] == sha(ROOT / 'build/dlss/GroundedDLSS.asi'), 'GPU evidence was recorded for a different ASI'
+    assert dynamic_record['asi_sha256'] == sha(runtime_asi), 'GPU evidence was recorded for a different ASI'
     assert len(dynamic_record['tests']) == 3 and all(x['exit_code'] == 0 and x['auto_runtime_created'] for x in dynamic_record['tests'])
     # The same ASI carries the own ProjectID checked above, so these GPU runs
     # are also the own-ProjectID GPU evidence.

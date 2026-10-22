@@ -10,7 +10,8 @@ template<class T> struct alignas(void*) ProbeStreamPart {
     T value;
 };
 
-inline bool ProbeComputeBytecode(const D3D12_PIPELINE_STATE_STREAM_DESC* desc, D3D12_SHADER_BYTECODE& shader) {
+inline bool ProbeShaderBytecode(const D3D12_PIPELINE_STATE_STREAM_DESC* desc, D3D12_SHADER_BYTECODE& shader,
+                               D3D12_PIPELINE_STATE_SUBOBJECT_TYPE wanted) {
     shader = {};
     if (!desc || !desc->pPipelineStateSubobjectStream || desc->SizeInBytes > 1024 * 1024) return false;
     auto bytes = static_cast<const unsigned char*>(desc->pPipelineStateSubobjectStream);
@@ -21,13 +22,13 @@ inline bool ProbeComputeBytecode(const D3D12_PIPELINE_STATE_STREAM_DESC* desc, D
         memcpy(&type, bytes + offset, sizeof(type));
         size_t size = 0;
         switch (type) {
-            case D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_CS: {
+            case D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_CS: case D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_PS: {
                 ProbeStreamPart<D3D12_SHADER_BYTECODE> part{};
                 if (desc->SizeInBytes - offset < sizeof(part)) return false;
-                memcpy(&part, bytes + offset, sizeof(part)); shader = part.value;
+                memcpy(&part, bytes + offset, sizeof(part)); if(type==wanted)shader = part.value;
                 size = sizeof(part); break;
             }
-            case D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_VS: case D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_PS:
+            case D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_VS:
             case D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_DS: case D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_HS:
             case D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_GS: case D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_AS:
             case D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_MS: size = sizeof(ProbeStreamPart<D3D12_SHADER_BYTECODE>); break;
@@ -57,5 +58,8 @@ inline bool ProbeComputeBytecode(const D3D12_PIPELINE_STATE_STREAM_DESC* desc, D
         offset += size;
     }
     return shader.pShaderBytecode && shader.BytecodeLength;
+}
+inline bool ProbeComputeBytecode(const D3D12_PIPELINE_STATE_STREAM_DESC* desc,D3D12_SHADER_BYTECODE& shader){
+    return ProbeShaderBytecode(desc,shader,D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_CS);
 }
 #pragma warning(pop)

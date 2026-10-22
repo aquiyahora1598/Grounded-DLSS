@@ -1,5 +1,8 @@
 #include "integration.h"
 #include "prepare_shader.h"
+#ifdef GROUNDED_FSR_FRAMEGEN
+#include "../framegen/fsr_runtime.h"
+#endif
 #include "gpu_identity.h"
 #include "preset_policy.h"
 #include "scale_presets.h"
@@ -409,6 +412,9 @@ bool Integration::Record(ID3D12GraphicsCommandList* list, const PassInput& input
     if(timed){list->EndQuery(frame->timestamps.Get(),D3D12_QUERY_TYPE_TIMESTAMP,3);
         list->ResolveQueryData(frame->timestamps.Get(),D3D12_QUERY_TYPE_TIMESTAMP,0,4,frame->timestampReadback.Get(),0);
         frame->timestampPending=true;}
+#ifdef GROUNDED_FSR_FRAMEGEN
+    framegen::fsr::RecordPrepared(list,c,frame->depth.Get(),frame->velocity.Get(),s.settings.renderWidth,s.settings.renderHeight,reset || s.resetNext);
+#endif
     s.resetNext=false; ++s.evaluations; s.error.clear(); return true;
 }
 void Integration::BeforeSubmit(ID3D12CommandQueue* queue) {

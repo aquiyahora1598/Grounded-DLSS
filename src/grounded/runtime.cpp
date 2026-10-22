@@ -23,6 +23,18 @@
 #include <cstdarg>
 #include <tlhelp32.h>
 #include <intrin.h>
+#ifdef GROUNDED_FRAMEGEN_PROBE
+#include "../framegen/presentation_probe.h"
+#endif
+#ifdef GROUNDED_FRAMEGEN_SCENE_PROBE
+#include "../framegen/scene_probe.h"
+#endif
+#ifdef GROUNDED_FSR_FRAMEGEN
+#include "../framegen/fsr_runtime.h"
+#endif
+#ifdef GROUNDED_FRAMEGEN_COLOR_CAPTURE
+#include "../framegen/hudless_capture.h"
+#endif
 #ifdef GROUNDED_FRAME_CAPTURE
 #include "frame_capture.h"
 #endif
@@ -30,6 +42,9 @@
 namespace {
 using Microsoft::WRL::ComPtr;
 HMODULE gModule=nullptr;
+#ifdef GROUNDED_FRAMEGEN_COLOR_CAPTURE
+grounded::framegen::HudlessCapture& hudlessCapture=*new grounded::framegen::HudlessCapture;
+#endif
 thread_local bool internal=false;
 struct Internal { bool old=internal; Internal(){internal=true;} ~Internal(){internal=old;} };
 // Set at DLL_PROCESS_DETACH, which only happens at process exit because the
@@ -465,6 +480,9 @@ void StoreDescriptor(UINT64 handle,const Descriptor& value) {
 ULONG STDMETHODCALLTYPE PipelineRelease(IUnknown* object) {
     auto original=Original<Release,2>(object);
     ULONG count=original(object);
+#ifdef GROUNDED_FRAMEGEN_SCENE_PROBE
+    if(!count && !terminating.load(std::memory_order_relaxed))grounded::framegen::scene_probe::Released(object);
+#endif
     if(!count && !terminating.load(std::memory_order_relaxed)) {std::unique_lock<std::shared_mutex> lock(metadataMutex);if(targets.erase(static_cast<ID3D12PipelineState*>(object)))++pipelineEpoch;}return count;
 }
 ULONG STDMETHODCALLTYPE RootRelease(IUnknown* object) {
@@ -485,6 +503,26 @@ void ObservePipeline(void* object,const D3D12_SHADER_BYTECODE& code) {
     Log("Verified Grounded %s shader %016llx PSO=%p",variant==grounded::PassVariant::Native100?"native 100% TAA":"TAAU",hash,pso.Get());
 }
 using Compute=HRESULT(STDMETHODCALLTYPE*)(ID3D12Device*,const D3D12_COMPUTE_PIPELINE_STATE_DESC*,REFIID,void**);
+#ifdef GROUNDED_FRAMEGEN_SCENE_PROBE
+void ObserveScene(void* object,const D3D12_SHADER_BYTECODE& code){
+    if(grounded::framegen::scene_probe::Pipeline(object,code))Hook(static_cast<IUnknown*>(object),2,reinterpret_cast<void*>(PipelineRelease));
+}
+using Graphics=HRESULT(STDMETHODCALLTYPE*)(ID3D12Device*,const D3D12_GRAPHICS_PIPELINE_STATE_DESC*,REFIID,void**);
+HRESULT STDMETHODCALLTYPE CreateGraphics(ID3D12Device* d,const D3D12_GRAPHICS_PIPELINE_STATE_DESC* desc,REFIID iid,void** out){
+    auto hr=Original<Graphics,10>(d)(d,desc,iid,out);
+    if(!Bypass() && SUCCEEDED(hr) && desc && out && *out)ObserveScene(*out,desc->PS);return hr;
+}
+using LoadGraphics=HRESULT(STDMETHODCALLTYPE*)(ID3D12PipelineLibrary*,LPCWSTR,const D3D12_GRAPHICS_PIPELINE_STATE_DESC*,REFIID,void**);
+HRESULT STDMETHODCALLTYPE LibraryGraphics(ID3D12PipelineLibrary* l,LPCWSTR name,const D3D12_GRAPHICS_PIPELINE_STATE_DESC* desc,REFIID iid,void** out){
+    auto hr=Original<LoadGraphics,9>(l)(l,name,desc,iid,out);
+    if(!Bypass() && SUCCEEDED(hr) && desc && out && *out)ObserveScene(*out,desc->PS);return hr;
+}
+using CreateRTV=void(STDMETHODCALLTYPE*)(ID3D12Device*,ID3D12Resource*,const D3D12_RENDER_TARGET_VIEW_DESC*,D3D12_CPU_DESCRIPTOR_HANDLE);
+void STDMETHODCALLTYPE MakeRTV(ID3D12Device* d,ID3D12Resource* resource,const D3D12_RENDER_TARGET_VIEW_DESC* desc,D3D12_CPU_DESCRIPTOR_HANDLE handle){
+    Original<CreateRTV,20>(d)(d,resource,desc,handle);
+    if(!Bypass())grounded::framegen::scene_probe::View(d,resource,handle);
+}
+#endif
 HRESULT STDMETHODCALLTYPE CreateCompute(ID3D12Device* d,const D3D12_COMPUTE_PIPELINE_STATE_DESC* desc,REFIID iid,void** out) {
     HRESULT hr=Original<Compute,11>(d)(d,desc,iid,out);
     if(!Bypass() && SUCCEEDED(hr) && out && desc) ObservePipeline(*out,desc->CS); return hr;
@@ -492,6 +530,9 @@ HRESULT STDMETHODCALLTYPE CreateCompute(ID3D12Device* d,const D3D12_COMPUTE_PIPE
 using Stream=HRESULT(STDMETHODCALLTYPE*)(ID3D12Device2*,const D3D12_PIPELINE_STATE_STREAM_DESC*,REFIID,void**);
 HRESULT STDMETHODCALLTYPE CreateStream(ID3D12Device2* d,const D3D12_PIPELINE_STATE_STREAM_DESC* desc,REFIID iid,void** out) {
     HRESULT hr=Original<Stream,47>(d)(d,desc,iid,out); D3D12_SHADER_BYTECODE code{};
+#ifdef GROUNDED_FRAMEGEN_SCENE_PROBE
+    if(!Bypass() && SUCCEEDED(hr) && out && *out && ProbeShaderBytecode(desc,code,D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_PS))ObserveScene(*out,code);
+#endif
     if(!Bypass() && SUCCEEDED(hr) && out && ProbeComputeBytecode(desc,code)) ObservePipeline(*out,code); return hr;
 }
 using LoadCompute=HRESULT(STDMETHODCALLTYPE*)(ID3D12PipelineLibrary*,LPCWSTR,const D3D12_COMPUTE_PIPELINE_STATE_DESC*,REFIID,void**);
@@ -502,10 +543,16 @@ HRESULT STDMETHODCALLTYPE LibraryCompute(ID3D12PipelineLibrary* l,LPCWSTR name,c
 using LoadStream=HRESULT(STDMETHODCALLTYPE*)(ID3D12PipelineLibrary1*,LPCWSTR,const D3D12_PIPELINE_STATE_STREAM_DESC*,REFIID,void**);
 HRESULT STDMETHODCALLTYPE LibraryStream(ID3D12PipelineLibrary1* l,LPCWSTR name,const D3D12_PIPELINE_STATE_STREAM_DESC* desc,REFIID iid,void** out) {
     HRESULT hr=Original<LoadStream,13>(l)(l,name,desc,iid,out); D3D12_SHADER_BYTECODE code{};
+#ifdef GROUNDED_FRAMEGEN_SCENE_PROBE
+    if(!Bypass() && SUCCEEDED(hr) && out && *out && ProbeShaderBytecode(desc,code,D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_PS))ObserveScene(*out,code);
+#endif
     if(!Bypass() && SUCCEEDED(hr) && out && ProbeComputeBytecode(desc,code)) ObservePipeline(*out,code); return hr;
 }
 bool HookLibrary(ID3D12PipelineLibrary* library) {
     bool ok=Hook(library,10,reinterpret_cast<void*>(LibraryCompute)); ComPtr<ID3D12PipelineLibrary1> extended;
+#ifdef GROUNDED_FRAMEGEN_SCENE_PROBE
+    ok=Hook(library,9,reinterpret_cast<void*>(LibraryGraphics))&&ok;
+#endif
     if(SUCCEEDED(library->QueryInterface(IID_PPV_ARGS(&extended)))) ok=Hook(extended.Get(),13,reinterpret_cast<void*>(LibraryStream))&&ok;
     return ok;
 }
@@ -635,6 +682,18 @@ using Reset=HRESULT(STDMETHODCALLTYPE*)(ID3D12GraphicsCommandList*,ID3D12Command
 HRESULT STDMETHODCALLTYPE ResetList(ID3D12GraphicsCommandList* list,ID3D12CommandAllocator* a,ID3D12PipelineState* pso) {
     HRESULT hr=Original<Reset,10>(list)(list,a,pso); if(Bypass() || FAILED(hr)) return hr;
     auto& state=State(list);
+#ifdef GROUNDED_FRAMEGEN_PROBE
+    grounded::framegen::probe::Discard(list);
+#endif
+#ifdef GROUNDED_FRAMEGEN_SCENE_PROBE
+    grounded::framegen::scene_probe::Reset(list);
+#endif
+#ifdef GROUNDED_FSR_FRAMEGEN
+    grounded::framegen::fsr::runtime.Discarded(list);
+#endif
+#ifdef GROUNDED_FRAMEGEN_COLOR_CAPTURE
+    hudlessCapture.Discarded(list);
+#endif
     if(state.dlssRecorded.load(std::memory_order_acquire)
 #ifdef GROUNDED_FRAME_CAPTURE
        || capturePendingList.load(std::memory_order_acquire)==list
@@ -650,6 +709,10 @@ HRESULT STDMETHODCALLTYPE ResetList(ID3D12GraphicsCommandList* list,ID3D12Comman
 }
 using Clear=void(STDMETHODCALLTYPE*)(ID3D12GraphicsCommandList*,ID3D12PipelineState*);
 void STDMETHODCALLTYPE ClearList(ID3D12GraphicsCommandList* list,ID3D12PipelineState* pso) {
+    // ClearState resets bindings, not recorded GPU work. Keep capture allocations.
+#ifdef GROUNDED_FRAMEGEN_SCENE_PROBE
+    if(!Bypass())grounded::framegen::scene_probe::Reset(list);
+#endif
     if(!Bypass()) {auto& s=State(list);s.Reset(pso,list->GetType()==D3D12_COMMAND_LIST_TYPE_DIRECT);s.target=IsTarget(pso);}
     Original<Clear,11>(list)(list,pso);
 }
@@ -857,6 +920,13 @@ void STDMETHODCALLTYPE DispatchList(ID3D12GraphicsCommandList* list,UINT x,UINT 
         ++fallbacks;historyDirty=true;original(list,x,y,z);return;
     }
     bool replaced=false;
+#ifdef GROUNDED_FRAMEGEN_SCENE_PROBE
+    grounded::framegen::scene_probe::state.temporalReady.store(true,std::memory_order_relaxed);
+#endif
+#ifdef GROUNDED_FRAMEGEN_PROBE
+    grounded::framegen::probe::RecordTemporal(list,input.constants.activeWidth,input.constants.activeHeight,
+        input.constants.outputWidth,input.constants.outputHeight);
+#endif
 #ifdef GROUNDED_FRAME_CAPTURE
     if(!enabled.load(std::memory_order_relaxed)) {
         original(list,x,y,z);
@@ -940,13 +1010,32 @@ void STDMETHODCALLTYPE ExecuteLists(ID3D12CommandQueue* queue,UINT count,ID3D12C
     if(!hasDLSS && !hasCapture){
         // Unrelated queues/lists do not access NGX or its frame/fence state.
         // Their submission may proceed while another thread records DLSS.
-        Profile plain(10);Internal guard;original(queue,count,lists);return;
+        Profile plain(10);Internal guard;original(queue,count,lists);
+#ifdef GROUNDED_FSR_FRAMEGEN
+        grounded::framegen::fsr::runtime.Submitted(queue,count,lists);
+#endif
+#ifdef GROUNDED_FRAMEGEN_COLOR_CAPTURE
+        hudlessCapture.Submitted(queue,count,lists);
+#endif
+#ifdef GROUNDED_FRAMEGEN_PROBE
+        grounded::framegen::probe::Submitted(queue,count,lists);
+#endif
+        return;
     }
     Profile withDLSS(11);
     std::lock_guard<std::mutex> lock(runtimeMutex);Internal guard;
     bool pending=false;if(integration)for(UINT i=0;i<count;++i)pending|=integration->HasPending(static_cast<ID3D12GraphicsCommandList*>(lists[i]));
     if(pending)integration->BeforeSubmit(queue);
     original(queue,count,lists);
+#ifdef GROUNDED_FSR_FRAMEGEN
+    grounded::framegen::fsr::runtime.Submitted(queue,count,lists);
+#endif
+#ifdef GROUNDED_FRAMEGEN_COLOR_CAPTURE
+    hudlessCapture.Submitted(queue,count,lists);
+#endif
+#ifdef GROUNDED_FRAMEGEN_PROBE
+    grounded::framegen::probe::Submitted(queue,count,lists);
+#endif
     if(integration)integration->Submitted(queue,count,lists);
 #ifdef GROUNDED_FRAME_CAPTURE
     if(hasCapture){frameCapture->Submitted(queue,count,lists);capturePendingList=nullptr;}
@@ -956,6 +1045,15 @@ ULONG STDMETHODCALLTYPE CommandRelease(IUnknown* object) {
     auto original=Original<Release,2>(object);ULONG count=original(object);
     if(!Bypass() && !count) {
         auto list=static_cast<ID3D12GraphicsCommandList*>(object);
+#ifdef GROUNDED_FSR_FRAMEGEN
+        grounded::framegen::fsr::runtime.Discarded(list);
+#endif
+#ifdef GROUNDED_FRAMEGEN_COLOR_CAPTURE
+        hudlessCapture.Discarded(list);
+#endif
+#ifdef GROUNDED_FRAMEGEN_SCENE_PROBE
+        grounded::framegen::scene_probe::Reset(list);
+#endif
         {std::lock_guard<std::mutex> lock(runtimeMutex);Internal guard;if(integration)integration->Discarded(list);}
 #ifdef GROUNDED_FRAME_CAPTURE
         {std::lock_guard<std::mutex> lock(runtimeMutex);Internal guard;frameCapture->Discarded(list);if(capturePendingList==list)capturePendingList=nullptr;}
@@ -963,8 +1061,36 @@ ULONG STDMETHODCALLTYPE CommandRelease(IUnknown* object) {
         std::unique_lock<std::shared_mutex> lock(commandsMutex);commands.erase(list);++commandEpoch;
     }return count;
 }
+#ifdef GROUNDED_FRAMEGEN_SCENE_PROBE
+using Draw=void(STDMETHODCALLTYPE*)(ID3D12GraphicsCommandList*,UINT,UINT,UINT,UINT);
+void STDMETHODCALLTYPE DrawVertices(ID3D12GraphicsCommandList* list,UINT count,UINT instances,UINT vertex,UINT instance){
+    Original<Draw,12>(list)(list,count,instances,vertex,instance);
+    if(!Bypass())grounded::framegen::scene_probe::Draw(list,State(list).pso,count,false);
+}
+using DrawIndexed=void(STDMETHODCALLTYPE*)(ID3D12GraphicsCommandList*,UINT,UINT,UINT,INT,UINT);
+void STDMETHODCALLTYPE DrawIndices(ID3D12GraphicsCommandList* list,UINT count,UINT instances,UINT start,INT base,UINT instance){
+    Original<DrawIndexed,13>(list)(list,count,instances,start,base,instance);
+    if(!Bypass())grounded::framegen::scene_probe::Draw(list,State(list).pso,count,true);
+}
+using SetRT=void(STDMETHODCALLTYPE*)(ID3D12GraphicsCommandList*,UINT,const D3D12_CPU_DESCRIPTOR_HANDLE*,BOOL,const D3D12_CPU_DESCRIPTOR_HANDLE*);
+void STDMETHODCALLTYPE Targets(ID3D12GraphicsCommandList* list,UINT count,const D3D12_CPU_DESCRIPTOR_HANDLE* handles,BOOL single,const D3D12_CPU_DESCRIPTOR_HANDLE* depth){
+    Original<SetRT,46>(list)(list,count,handles,single,depth);
+    if(!Bypass())grounded::framegen::scene_probe::Targets(list,count,handles,single,false);
+}
+using BeginRP=void(STDMETHODCALLTYPE*)(ID3D12GraphicsCommandList4*,UINT,const D3D12_RENDER_PASS_RENDER_TARGET_DESC*,const D3D12_RENDER_PASS_DEPTH_STENCIL_DESC*,D3D12_RENDER_PASS_FLAGS);
+void STDMETHODCALLTYPE BeginPass(ID3D12GraphicsCommandList4* list,UINT count,const D3D12_RENDER_PASS_RENDER_TARGET_DESC* renderTargets,const D3D12_RENDER_PASS_DEPTH_STENCIL_DESC* depth,D3D12_RENDER_PASS_FLAGS flags){
+    Original<BeginRP,68>(list)(list,count,renderTargets,depth,flags);
+    if(!Bypass()){D3D12_CPU_DESCRIPTOR_HANDLE handles[8]{};for(UINT i=0;renderTargets && i<count && i<8;++i)handles[i]=renderTargets[i].cpuDescriptor;
+        grounded::framegen::scene_probe::Targets(list,std::min(count,8u),handles,FALSE,true);}
+}
+using EndRP=void(STDMETHODCALLTYPE*)(ID3D12GraphicsCommandList4*);
+void STDMETHODCALLTYPE EndPass(ID3D12GraphicsCommandList4* list){
+    Original<EndRP,69>(list)(list);
+    if(!Bypass())grounded::framegen::scene_probe::End(list);
+}
+#endif
 bool HookCommand(ID3D12GraphicsCommandList* l) {
-    return Hook(l,2,reinterpret_cast<void*>(CommandRelease)) && Hook(l,10,reinterpret_cast<void*>(ResetList)) && Hook(l,11,reinterpret_cast<void*>(ClearList)) &&
+    bool ok=Hook(l,2,reinterpret_cast<void*>(CommandRelease)) && Hook(l,10,reinterpret_cast<void*>(ResetList)) && Hook(l,11,reinterpret_cast<void*>(ClearList)) &&
         Hook(l,14,reinterpret_cast<void*>(DispatchList)) && Hook(l,25,reinterpret_cast<void*>(SetPipeline)) && Hook(l,28,reinterpret_cast<void*>(SetDescriptorHeaps)) &&
         Hook(l,29,reinterpret_cast<void*>(SetSignature<29,false>)) && Hook(l,30,reinterpret_cast<void*>(SetSignature<30,true>)) &&
         Hook(l,31,reinterpret_cast<void*>(SetDescriptorTable<31,false>)) && Hook(l,32,reinterpret_cast<void*>(SetDescriptorTable<32,true>)) &&
@@ -973,6 +1099,12 @@ bool HookCommand(ID3D12GraphicsCommandList* l) {
         Hook(l,37,reinterpret_cast<void*>(SetGPUAddress<37,false,Argument::CBV>)) && Hook(l,38,reinterpret_cast<void*>(SetGPUAddress<38,true,Argument::CBV>)) &&
         Hook(l,39,reinterpret_cast<void*>(SetGPUAddress<39,false,Argument::SRV>)) && Hook(l,40,reinterpret_cast<void*>(SetGPUAddress<40,true,Argument::SRV>)) &&
         Hook(l,41,reinterpret_cast<void*>(SetGPUAddress<41,false,Argument::UAV>)) && Hook(l,42,reinterpret_cast<void*>(SetGPUAddress<42,true,Argument::UAV>));
+#ifdef GROUNDED_FRAMEGEN_SCENE_PROBE
+    ok=Hook(l,12,reinterpret_cast<void*>(DrawVertices)) && Hook(l,13,reinterpret_cast<void*>(DrawIndices)) && Hook(l,46,reinterpret_cast<void*>(Targets)) && ok;
+    ComPtr<ID3D12GraphicsCommandList4> four;
+    if(SUCCEEDED(l->QueryInterface(IID_PPV_ARGS(&four))))ok=Hook(four.Get(),68,reinterpret_cast<void*>(BeginPass)) && Hook(four.Get(),69,reinterpret_cast<void*>(EndPass)) && ok;
+#endif
+    return ok;
 }
 using MakeList=HRESULT(STDMETHODCALLTYPE*)(ID3D12Device*,UINT,D3D12_COMMAND_LIST_TYPE,ID3D12CommandAllocator*,ID3D12PipelineState*,REFIID,void**);
 HRESULT STDMETHODCALLTYPE CreateList(ID3D12Device* d,UINT node,D3D12_COMMAND_LIST_TYPE type,ID3D12CommandAllocator* a,ID3D12PipelineState* p,REFIID iid,void** out) {
@@ -1012,6 +1144,18 @@ DWORD WINAPI Initialize(void*) {
             MoveFileExW(log.c_str(),(directory/L"GroundedDLSS-runtime.previous.log").c_str(),MOVEFILE_REPLACE_EXISTING);
     }
     Log("Grounded DLSS runtime v11.23.2 beta; own NGX ProjectID; direct NVIDIA NGX; standalone loader supported; time-based native autofocus; GPU-aware K/M/L presets; sharpening OFF by default; F8 toggles native/DLSS; no overlay");
+#if defined(GROUNDED_FRAMEGEN_PROBE) && !defined(GROUNDED_FSR_FRAMEGEN)
+    Log("EXPERIMENTAL FRAME GENERATION RESEARCH: presentation metadata observer only; no FG backend enabled");
+#endif
+#ifdef GROUNDED_FSR_FRAMEGEN
+    Log("Grounded DLSS + FSR FG v11.24.0 beta; F8 toggles DLSS/DLAA; F9 toggles AMD FSR 3.1.6 Frame Generation; SDR; no NVIDIA FG loaded");
+#endif
+#ifdef GROUNDED_FRAMEGEN_COLOR_CAPTURE
+    Log("FG HUD-less capture: one verified RT copy plus readback; diagnostic GPU work; no FG backend enabled");
+    grounded::framegen::scene_probe::state.verifiedDraw=[](ID3D12GraphicsCommandList* list,ID3D12Resource* source){
+        Internal guard;if(hudlessCapture.Record(list,source))Log("FG HUD-less color copy recorded; awaiting actual GPU submission fence");
+    };
+#endif
     const auto sharpening=grounded::sharpness_control::ReadSettings((directory/L"GroundedDLSS.ini").c_str());
     grounded::sharpness_control::Configure(sharpening);
     grounded::focus_control::Configure((directory/L"GroundedDLSS.ini").c_str());
@@ -1047,6 +1191,18 @@ DWORD WINAPI Initialize(void*) {
         ComPtr<IDXGIAdapter1> a;if(factory->EnumAdapters1(i,&a)==DXGI_ERROR_NOT_FOUND)break;
         DXGI_ADAPTER_DESC1 desc{};a->GetDesc1(&desc);if(desc.VendorId==0x10de){selected=a;break;}
     }
+#ifdef GROUNDED_FSR_FRAMEGEN
+    if(factory && grounded::framegen::fsr::Install(factory.Get(),directory/L"FSRFrameGeneration",Log)){
+        grounded::framegen::fsr::runtime.desired=GetPrivateProfileIntW(L"FrameGeneration",L"Enabled",1,(directory/L"GroundedDLSS.ini").c_str())!=0;
+        grounded::framegen::probe::state.presentOverride=[](IDXGISwapChain* chain,UINT interval,UINT flags,const DXGI_PRESENT_PARAMETERS* params,bool one,void* fn){
+            Internal guard;return grounded::framegen::fsr::Present(chain,interval,flags,params,one,fn);};
+    }
+#elif defined(GROUNDED_FRAMEGEN_PROBE)
+#ifdef GROUNDED_FRAMEGEN_SCENE_PROBE
+    grounded::framegen::probe::state.chainNotification=grounded::framegen::scene_probe::Chain;
+#endif
+    if(factory)grounded::framegen::probe::Install(factory.Get(),Log,reinterpret_cast<uintptr_t>(GetModuleHandleW(nullptr)),111910912);
+#endif
     ComPtr<ID3D12Device> device;
     bool ok=selected && SUCCEEDED(D3D12CreateDevice(selected.Get(),D3D_FEATURE_LEVEL_11_0,IID_PPV_ARGS(&device)));
     if(ok) {
@@ -1063,6 +1219,9 @@ DWORD WINAPI Initialize(void*) {
         ok=ok && l && q && HookCommand(l.Get()) && Hook(q.Get(),10,reinterpret_cast<void*>(ExecuteLists));
         ok=ok && Hook(device.Get(),8,reinterpret_cast<void*>(CreateQueue)) && Hook(device.Get(),11,reinterpret_cast<void*>(CreateCompute)) &&
             Hook(device.Get(),12,reinterpret_cast<void*>(CreateList)) && Hook(device.Get(),16,reinterpret_cast<void*>(MakeRoot));
+#ifdef GROUNDED_FRAMEGEN_SCENE_PROBE
+        ok=Hook(device.Get(),10,reinterpret_cast<void*>(CreateGraphics)) && Hook(device.Get(),20,reinterpret_cast<void*>(MakeRTV)) && ok;
+#endif
         if(nativeBridgeMode!=2)ok=ok && Hook(device.Get(),14,reinterpret_cast<void*>(CreateHeap)) &&
             Hook(device.Get(),17,reinterpret_cast<void*>(MakeCBV)) && Hook(device.Get(),18,reinterpret_cast<void*>(MakeSRV)) &&
             Hook(device.Get(),19,reinterpret_cast<void*>(MakeUAV)) && Hook(device.Get(),23,reinterpret_cast<void*>(CopyDescriptors)) &&
@@ -1084,6 +1243,9 @@ DWORD WINAPI Initialize(void*) {
     if(scaleThread){WaitForSingleObject(scaleThread,INFINITE);CloseHandle(scaleThread);}
     ready=ok?1:-1;Log("Hooks ready=%s",ok?"true":"false");
     bool lastF8=false;ULONGLONG lastStatus=0,lastControl=0;UINT64 controlSequence=0;
+#ifdef GROUNDED_FSR_FRAMEGEN
+    bool lastF9=false;
+#endif
 #ifdef GROUNDED_FRAME_CAPTURE
     UINT64 captureSequence=0;ULONGLONG captureDeadline=0;std::string captureError;
     Log("One-frame texture capture diagnostic enabled; explicit PID-scoped request required; no continuous capture");
@@ -1098,7 +1260,21 @@ DWORD WINAPI Initialize(void*) {
             else {enabled=!enabled.load();evaluated=false;historyDirty=true;grounded::sharpness_control::Publish(false,0);Log("F8: %s",enabled?"DLSS requested":"native TAAU");MessageBeep(MB_OK);}
         }
         lastF8=f8;
+#ifdef GROUNDED_FSR_FRAMEGEN
+        // Include the pressed-since-last-poll bit, like F8: a short press can
+        // otherwise fall between polls while status/presentation work runs.
+        const bool f9=(GetAsyncKeyState(VK_F9)&0x8001)!=0;
+        if(f9 && !lastF9 && foregroundPID==GetCurrentProcessId()){Internal guard;grounded::framegen::fsr::runtime.SetEnabled(!grounded::framegen::fsr::runtime.desired);MessageBeep(MB_OK);}
+        lastF9=f9;
+#endif
         if(GetTickCount64()-lastControl>=250) {
+#ifdef GROUNDED_FSR_FRAMEGEN
+            {Internal guard;grounded::framegen::fsr::runtime.WriteStatus(directory/L"GroundedDLSS-FSR-FG-status.txt");}
+#endif
+#ifdef GROUNDED_FRAMEGEN_COLOR_CAPTURE
+            {Internal guard;const int result=hudlessCapture.Poll(directory/L"GroundedDLSS-framegen-captures"/std::to_wstring(GetCurrentProcessId()));
+                if(result)Log("FG HUD-less capture completed result=%d; fg_enabled=0",result);}
+#endif
             TryGameScalePresets();
             {std::lock_guard<std::mutex> lock(runtimeMutex);TryGameSharpness();}
             // Local automation control: unique increasing sequence and mode 0/1.
@@ -1219,6 +1395,11 @@ extern "C" __declspec(dllexport) int __cdecl GroundedDLSSGetGpuProfile(grounded:
 }
 BOOL APIENTRY DllMain(HMODULE module,DWORD reason,LPVOID) {
     if(reason==DLL_PROCESS_ATTACH) {gModule=module;DisableThreadLibraryCalls(module);HANDLE thread=CreateThread(nullptr,0,Initialize,nullptr,0,nullptr);if(thread)CloseHandle(thread);}
-    else if(reason==DLL_PROCESS_DETACH)terminating.store(true,std::memory_order_release);
+    else if(reason==DLL_PROCESS_DETACH){
+#ifdef GROUNDED_FRAMEGEN_PROBE
+        grounded::framegen::probe::Terminating();
+#endif
+        terminating.store(true,std::memory_order_release);
+    }
     return TRUE;
 }

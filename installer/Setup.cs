@@ -18,7 +18,7 @@ namespace GroundedDLSSSetup {
  public class Item { public string Path, Hash, Backup; public bool Active=true, Config; }
  public class Key { public string Name, Before, After; }
  public class State {
-  public int Format=3; public string Root, EnginePath, EngineBeforeHash, EngineAfterHash, SelfHash; public bool EngineExisted,EngineUserChangesSeen;
+  public int Format=4; public string Root, EnginePath, EngineBeforeHash, EngineAfterHash, SelfHash; public bool EngineExisted,EngineUserChangesSeen;
   public string SettingsBeforeHash,SettingsAfterHash,FsrBefore; public bool SettingsExisted,SettingsUserChangesSeen;
   public List<Item> Items=new List<Item>(); public List<Key> Keys=new List<Key>();
  }
@@ -112,7 +112,7 @@ namespace GroundedDLSSSetup {
  }
  public sealed class Engine {
   public const string ExeHash="5dbc5dd94a2d222e674aaa86bdb195de0cd0b0f14fe765afb6b37dbda8b06306";
-  public static readonly string[] Allowed={@"Maine\Binaries\Win64\dxgi.dll",@"Maine\Binaries\Win64\plugins\GroundedDLSS.asi",@"Maine\Binaries\Win64\plugins\GroundedDLSS.ini",@"Maine\Binaries\Win64\plugins\GroundedDLSS-runtime\nvngx_dlss.dll",@"Maine\Binaries\Win64\GroundedDLSS-install\LEEME.txt",@"Maine\Binaries\Win64\GroundedDLSS-install\NVIDIA-RTX-SDK-LICENSE.txt",@"Maine\Binaries\Win64\GroundedDLSS-install\THIRD-PARTY-NOTICES.txt",@"Maine\Binaries\Win64\GroundedDLSS-install\LICENSE.txt",@"Maine\Binaries\Win64\GroundedDLSS-install\TERMINOS.txt",@"Maine\Binaries\Win64\GroundedDLSS-install\LEEME.en.txt",@"Maine\Binaries\Win64\GroundedDLSS-install\LEEME.pt-BR.txt",@"Maine\Binaries\Win64\GroundedDLSS-install\TERMINOS.en.txt",@"Maine\Binaries\Win64\GroundedDLSS-install\TERMINOS.pt-BR.txt"};
+  public static readonly string[] Allowed={@"Maine\Binaries\Win64\dxgi.dll",@"Maine\Binaries\Win64\plugins\GroundedDLSS.asi",@"Maine\Binaries\Win64\plugins\GroundedDLSS.ini",@"Maine\Binaries\Win64\plugins\GroundedDLSS-runtime\nvngx_dlss.dll",@"Maine\Binaries\Win64\GroundedDLSS-install\LEEME.txt",@"Maine\Binaries\Win64\GroundedDLSS-install\NVIDIA-RTX-SDK-LICENSE.txt",@"Maine\Binaries\Win64\GroundedDLSS-install\THIRD-PARTY-NOTICES.txt",@"Maine\Binaries\Win64\GroundedDLSS-install\LICENSE.txt",@"Maine\Binaries\Win64\GroundedDLSS-install\TERMINOS.txt",@"Maine\Binaries\Win64\GroundedDLSS-install\LEEME.en.txt",@"Maine\Binaries\Win64\GroundedDLSS-install\LEEME.pt-BR.txt",@"Maine\Binaries\Win64\GroundedDLSS-install\TERMINOS.en.txt",@"Maine\Binaries\Win64\GroundedDLSS-install\TERMINOS.pt-BR.txt",@"Maine\Binaries\Win64\plugins\FSRFrameGeneration\amd_fidelityfx_loader_dx12.dll",@"Maine\Binaries\Win64\plugins\FSRFrameGeneration\amd_fidelityfx_framegeneration_dx12.dll",@"Maine\Binaries\Win64\GroundedDLSS-install\AMD-FidelityFX-SDK-LICENSE.txt"};
   public const string GameSettingsSection="/Script/Maine.MaineGameUserSettings";
   readonly string root, data, stateFile, engine, settings, txdir; readonly bool fixture;
   public Action<string> Log=delegate{}; public Action<int> Fault;
@@ -140,12 +140,13 @@ namespace GroundedDLSSSetup {
   State Read() {
    if(!File.Exists(stateFile))return new State {Root=root,EnginePath=engine};
    State s;using(var f=File.OpenRead(stateFile))s=(State)new XmlSerializer(typeof(State)).Deserialize(f);
-   if((s.Format!=1&&s.Format!=2&&s.Format!=3)||!String.Equals(s.Root,root,StringComparison.OrdinalIgnoreCase)||!String.Equals(s.EnginePath,engine,StringComparison.OrdinalIgnoreCase))throw new IOException(I18n.T("El registro de instalación no corresponde a esta carpeta o usuario."));
+   if((s.Format!=1&&s.Format!=2&&s.Format!=3&&s.Format!=4)||!String.Equals(s.Root,root,StringComparison.OrdinalIgnoreCase)||!String.Equals(s.EnginePath,engine,StringComparison.OrdinalIgnoreCase))throw new IOException(I18n.T("El registro de instalación no corresponde a esta carpeta o usuario."));
    // Format 2 preserves changes made between install and update. Older setup
    // versions must refuse this state rather than ignore that preservation flag.
    // Format 3 also owns the FSR setting. Older installers must refuse it rather
    // than uninstall without restoring the separately recorded menu preference.
-   s.Format=3;
+   // Format 4 owns the AMD FG dependencies. Old uninstallers must refuse it.
+   s.Format=4;
    foreach(var x in s.Items){if(!Allowed.Contains(x.Path,StringComparer.OrdinalIgnoreCase)||x.Backup!=null)throw new IOException(I18n.T("Registro de archivos inválido."));Safe.Child(root,x.Path);}
    string[] keys={"r.DefaultFeature.AntiAliasing","r.PostProcessAAQuality","r.TemporalAA.Upsampling","r.TemporalAASamples","r.VelocityOutputPass","r.VertexDeformationOutputsVelocity"};
    if(s.Keys.Any(k=>!keys.Contains(k.Name)))throw new IOException(I18n.T("Registro de ajustes inválido."));
@@ -265,7 +266,7 @@ namespace GroundedDLSSSetup {
     if(self!=null){if(installedSelfHash!=selfHash)tx.Write(selfPath,self);s.SelfHash=selfHash;}
     tx.Write(stateFile,Serialize(s));tx.Commit();
    }
-   Log(I18n.T("Instalación completada. FSR desactivado automáticamente; se conservó tu selección anterior para desinstalar. No se modificaron partidas. Iniciá el juego con DirectX 12."));
+   Log(I18n.T("Instalación completada. F8: activar/desactivar DLSS/DLAA. F9: activar/desactivar FSR Frame Generation. El escalado FSR del menú quedó apagado. Se conservó tu selección anterior para desinstalar. Iniciá con DirectX 12."));
   }
   public void Uninstall(){using(var gate=new Gate(root)){UninstallCore();}}
   void UninstallCore() {
@@ -310,23 +311,25 @@ namespace GroundedDLSSSetup {
   bool busy;
   string EnginePath {get{return System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),@"Maine\Saved\Config\WindowsNoEditor\Engine.ini");}}
   public SetupForm() {
-   Text=I18n.T("Grounded DLSS — beta, revisión legal pendiente");ClientSize=new Size(760,680);MinimumSize=Size;StartPosition=FormStartPosition.CenterScreen;Font=new Font("Segoe UI",10);
-   Controls.Add(new Label {Text="Grounded DLSS · 11.23.4 Beta",Font=new Font("Segoe UI",19,FontStyle.Bold),Left=24,Top=20,Width=425,Height=40});
+   Text=I18n.T("Grounded DLSS — beta, revisión legal pendiente");ClientSize=new Size(760,796);MinimumSize=Size;StartPosition=FormStartPosition.CenterScreen;Font=new Font("Segoe UI",10);
+   Controls.Add(new Label {Text="Grounded DLSS · 11.24.0 Beta",Font=new Font("Segoe UI",19,FontStyle.Bold),Left=24,Top=20,Width=425,Height=40});
    Controls.Add(new Label {Text=I18n.T("Idioma"),Left=455,Top=32,Width=80,Height=25});
    languageSelector.SetBounds(535,27,199,30);languageSelector.Items.AddRange(new object[]{"Español","English","Português (Brasil)"});
    languageSelector.SelectedIndex=Array.IndexOf(new[]{"es","en","pt-BR"},I18n.Language);Controls.Add(languageSelector);
    Controls.Add(new Label {Text="Steam 1.4.7.4815 · Windows 10/11 x64 · NVIDIA RTX · DirectX 12",Left=24,Top=70,Width=680,Height=30});
-   Controls.Add(new TextBox {ReadOnly=true,Multiline=true,ScrollBars=ScrollBars.Vertical,Left=24,Top=106,Width=710,Height=145,Text=I18n.T("Beta: revisión de licencias y marcas pendiente.\r\nMod no oficial, sin garantía; no afiliado a NVIDIA, Obsidian ni Xbox.\r\nCerrá el juego. Conservá una copia de tus partidas. FSR se desactiva automáticamente al instalar; se restaura al desinstalar si no cambiaste esa opción.\r\nLa nitidez está desactivada. Ultra Rendimiento puede perder mucho detalle. La profundidad de campo sigue en evaluación.\r\nInstalador sin firma digital. No cambia drivers, seguridad ni partidas. Usa los componentes locales de NVIDIA; no descarga DLSS ni instala bibliotecas de respaldo.")});
-   Controls.Add(new Label {Text=I18n.T("Carpeta del juego (la que contiene Grounded.exe):"),Left=24,Top=267,Width=650,Height=25});
-   folder.SetBounds(24,296,560,28);Controls.Add(folder);folder.Text=Detect();
-   var browse=new Button {Text=I18n.T("Buscar…"),Left=594,Top=294,Width=100,Height=32};browse.Click+=delegate{using(var d=new FolderBrowserDialog()){d.Description=I18n.T("Elegí la carpeta Grounded");d.SelectedPath=folder.Text;if(d.ShowDialog()==DialogResult.OK)folder.Text=d.SelectedPath;}};Controls.Add(browse);
-   Controls.Add(new Label {Text=I18n.T("DLSS se detecta automáticamente entre los componentes de NVIDIA. Si falta una biblioteca compatible, la instalación se detiene sin modificar el juego."),Left=24,Top=337,Width=710,Height=48});
-   var terms=new Button {Text=I18n.T("Ver ayuda, términos y licencias"),Left=24,Top=395,Width=270,Height=32};terms.Click+=delegate{using(var view=CreateTermsView())view.ShowDialog(this);};Controls.Add(terms);
-   consent.Text=I18n.T("Leí y acepto los términos del mod y la licencia NVIDIA aplicable.");consent.SetBounds(24,440,710,32);Controls.Add(consent);
-   install.Text=I18n.T("Instalar / actualizar");install.SetBounds(24,485,216,36);install.Click+=async delegate {if(!consent.Checked){MessageBox.Show(this,I18n.T("Leé los términos y la licencia NVIDIA antes de aceptar e instalar."));return;}await Run(true,false);};Controls.Add(install);
-   remove.Text=I18n.T("Desinstalar");remove.SetBounds(250,485,216,36);remove.Click+=async delegate{await Run(false,false);};Controls.Add(remove);
-   recover.Text=I18n.T("Recuperar operación");recover.SetBounds(476,485,258,36);recover.Click+=async delegate{await Run(false,true);};Controls.Add(recover);
-   log.SetBounds(24,540,710,115);log.Multiline=true;log.ReadOnly=true;log.ScrollBars=ScrollBars.Vertical;Controls.Add(log);
+   Controls.Add(new Label {Name="ShortcutDLSS",Text=I18n.T("F8  ·  ACTIVAR / DESACTIVAR DLSS / DLAA"),Font=new Font("Segoe UI",14,FontStyle.Bold),BackColor=Color.FromArgb(24,65,112),ForeColor=Color.White,Padding=new Padding(14,0,0,0),TextAlign=ContentAlignment.MiddleLeft,Left=24,Top=106,Width=710,Height=44});
+   Controls.Add(new Label {Name="ShortcutFrameGeneration",Text=I18n.T("F9  ·  ACTIVAR / DESACTIVAR FSR FRAME GENERATION"),Font=new Font("Segoe UI",14,FontStyle.Bold),BackColor=Color.FromArgb(24,96,64),ForeColor=Color.White,Padding=new Padding(14,0,0,0),TextAlign=ContentAlignment.MiddleLeft,Left=24,Top=158,Width=710,Height=44});
+   Controls.Add(new TextBox {ReadOnly=true,Multiline=true,ScrollBars=ScrollBars.Vertical,Left=24,Top=222,Width=710,Height=145,Text=I18n.T("Beta: revisión de licencias y marcas pendiente.\r\nMod no oficial, sin garantía; no afiliado a NVIDIA, Obsidian ni Xbox.\r\nCerrá el juego. Conservá una copia de tus partidas. El escalado FSR del menú se desactiva automáticamente al instalar; se restaura al desinstalar si no cambiaste esa opción.\r\nLa nitidez está desactivada. Ultra Rendimiento puede perder mucho detalle. La profundidad de campo sigue en evaluación.\r\nInstalador sin firma digital. No cambia drivers, seguridad ni partidas. Usa los componentes locales de NVIDIA; no descarga DLSS ni instala bibliotecas de respaldo.")});
+   Controls.Add(new Label {Text=I18n.T("Carpeta del juego (la que contiene Grounded.exe):"),Left=24,Top=383,Width=650,Height=25});
+   folder.SetBounds(24,412,560,28);Controls.Add(folder);folder.Text=Detect();
+   var browse=new Button {Text=I18n.T("Buscar…"),Left=594,Top=410,Width=100,Height=32};browse.Click+=delegate{using(var d=new FolderBrowserDialog()){d.Description=I18n.T("Elegí la carpeta Grounded");d.SelectedPath=folder.Text;if(d.ShowDialog()==DialogResult.OK)folder.Text=d.SelectedPath;}};Controls.Add(browse);
+   Controls.Add(new Label {Text=I18n.T("DLSS se detecta automáticamente entre los componentes de NVIDIA. Si falta una biblioteca compatible, la instalación se detiene sin modificar el juego."),Left=24,Top=453,Width=710,Height=48});
+   var terms=new Button {Text=I18n.T("Ver ayuda, términos y licencias"),Left=24,Top=511,Width=270,Height=32};terms.Click+=delegate{using(var view=CreateTermsView())view.ShowDialog(this);};Controls.Add(terms);
+   consent.Text=I18n.T("Leí y acepto los términos del mod y las licencias NVIDIA y AMD aplicables.");consent.SetBounds(24,556,710,32);Controls.Add(consent);
+   install.Text=I18n.T("Instalar / actualizar");install.SetBounds(24,601,216,36);install.Click+=async delegate {if(!consent.Checked){MessageBox.Show(this,I18n.T("Leé los términos y las licencias NVIDIA y AMD antes de aceptar e instalar."));return;}await Run(true,false);};Controls.Add(install);
+   remove.Text=I18n.T("Desinstalar");remove.SetBounds(250,601,216,36);remove.Click+=async delegate{await Run(false,false);};Controls.Add(remove);
+   recover.Text=I18n.T("Recuperar operación");recover.SetBounds(476,601,258,36);recover.Click+=async delegate{await Run(false,true);};Controls.Add(recover);
+   log.SetBounds(24,656,710,115);log.Multiline=true;log.ReadOnly=true;log.ScrollBars=ScrollBars.Vertical;Controls.Add(log);
    FormClosing+=delegate(object sender,FormClosingEventArgs args){if(busy){args.Cancel=true;log.AppendText(I18n.T("Esperá a que termine la operación antes de cerrar.")+Environment.NewLine);}};
    // Bind only translatable captions. Never reset the selected folder or logs
    // when the user switches languages, and never preselect legal consent.
@@ -343,7 +346,7 @@ namespace GroundedDLSSSetup {
    try {
     var tabs=new TabControl {Dock=DockStyle.Fill};view.Controls.Add(tabs);
     using(var resource=Assembly.GetExecutingAssembly().GetManifestResourceStream("payload.zip"))using(var zip=new ZipArchive(resource,ZipArchiveMode.Read))
-     foreach(var doc in new[]{new[]{I18n.Document("LEEME"),"Ayuda"},new[]{I18n.Document("TERMINOS"),"Términos del mod"},new[]{"LICENSE.txt","Licencia MIT (original)"},new[]{"NVIDIA-RTX-SDK-LICENSE.txt","NVIDIA RTX SDK (inglés original)"},new[]{"THIRD-PARTY-NOTICES.txt","Avisos de terceros (original)"}}){
+     foreach(var doc in new[]{new[]{I18n.Document("LEEME"),"Ayuda"},new[]{I18n.Document("TERMINOS"),"Términos del mod"},new[]{"LICENSE.txt","Licencia MIT (original)"},new[]{"NVIDIA-RTX-SDK-LICENSE.txt","NVIDIA RTX SDK (inglés original)"},new[]{"THIRD-PARTY-NOTICES.txt","Avisos de terceros (original)"},new[]{"AMD-FidelityFX-SDK-LICENSE.txt","AMD FidelityFX SDK (inglés original)"}}){
       string name=doc[0];
       var entry=zip.Entries.Single(e=>e.FullName.EndsWith("/"+name,StringComparison.Ordinal));
       using(var reader=new StreamReader(entry.Open(),Encoding.UTF8,true)){var tab=new TabPage(I18n.T(doc[1]));tab.Controls.Add(new TextBox {Multiline=true,ReadOnly=true,ScrollBars=ScrollBars.Both,Dock=DockStyle.Fill,Text=reader.ReadToEnd(),Font=new Font("Segoe UI",10)});tabs.TabPages.Add(tab);}

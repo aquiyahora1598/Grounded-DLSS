@@ -1,4 +1,23 @@
-GROUNDED DLSS 11.23.4 BETA (unchanged 11.23.2 runtime)
+GROUNDED DLSS + FSR FRAME GENERATION — 11.24.0 BETA
+
+==============================================================
+F8  = ENABLE / DISABLE DLSS / DLAA
+F9  = ENABLE / DISABLE FSR FRAME GENERATION
+==============================================================
+DLSS and FG start enabled. Use F9 to compare FG alone.
+This beta suspends FG when F8 disables DLSS; it resumes with DLSS.
+The in-game "AMD FSR" option is another upscaler: leave it OFF.
+The installer turns that upscaler off. Use F9 for FSR Frame Generation.
+
+AMD analytical FG 3.1.6, SDR output. Bundles two official signed AMD
+DLLs with their original license. No NVIDIA DLL is bundled/downloaded.
+Sharpening is off. FG suspends during pause, loading and menus.
+Brief artifacts may appear when opening pause; still under evaluation.
+FG increases presented frames; it does not double input responsiveness.
+To start without FG: set [FrameGeneration] Enabled=0 in the INI.
+Use this EXE to install, update or uninstall the mod.
+
+GROUNDED DLSS 11.24.0 BETA
 License and trademark review remains pending. Read LEGAL.md.
 
 REQUIREMENTS
@@ -10,7 +29,7 @@ A clean driver installation may lack this component.
 
 INSTALL OR UPDATE
 1. Close Grounded normally and back up your saves.
-2. Open GroundedDLSS-11.23.4-beta-Setup.exe and select your language.
+2. Open GroundedDLSS-11.24.0-beta-Setup.exe and select your language.
 3. Choose the Grounded folder, read the terms and licenses, accept and select
    Install / update. No changes are made if a compatible NVIDIA source is missing.
 4. Start the game with DirectX 12. The installer has already turned FSR off.

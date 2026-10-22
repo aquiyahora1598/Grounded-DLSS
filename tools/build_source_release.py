@@ -20,6 +20,12 @@ def source_files():
         'tools/build.py', 'tools/build_release.py', 'tools/build_source_release.py',
         'tools/fetch_sdk.py', 'tools/sdk-sources.json', 'tools/review_legal_release.py',
         'publication/clearance.json', 'publication/LEGAL.md',
+        'src/framegen/fsr_runtime.h', 'src/framegen/camera.h',
+        'src/framegen/scene_probe.h', 'src/framegen/presentation_probe.h',
+        'src/framegen/hudless_capture.h',
+        'licenses/AMD-FidelityFX-SDK-LICENSE.txt', 'tools/fetch_framegen_sdks.py',
+        'tests/framegen_camera.cpp', 'tests/framegen_fsr_present.cpp',
+        'tools/framegen_fsr_dispatch.cpp', 'tests/installer_framegen.cs',
         'tests/local_runtime.cpp', 'tests/installer.cs', 'tests/installer_review.cs', 'tests/installer_fsr.cs', 'tests/installer_languages.cs', 'tests/installer_runtime.cs', 'tests/installer_cache.cs',
         'tests/scale_presets.cpp', 'tests/viewport_scale.cpp', 'tests/sharpness_control.cpp',
         'tests/preset_policy.cpp', 'tests/focus_time.cpp', 'tests/focus_abi.cpp',
@@ -33,6 +39,7 @@ def source_files():
     # The public build entry point offers only included targets. Research targets
     # are not part of the release and must not point at nonpublished tools.
     allowed = {'local-runtime-test', 'loader', 'dlss', 'scale-presets', 'viewport-scale', 'sharpness-control',
+               'dlss-fsr-framegen', 'framegen-camera-test', 'framegen-fsr-present', 'framegen-fsr-dispatch',
                'preset-policy', 'focus-time-test', 'focus-abi-test',
                'native-temporal-probe-test', 'loader-compat', 'loader-early', 'loader-smoke'}
     import build
@@ -41,7 +48,7 @@ def source_files():
     start = text.index('TARGETS = {')
     end = text.index('\n\n\ndef find_vcvars', start)
     text = text[:start] + 'TARGETS = ' + repr(selected) + text[end:]
-    text = text.replace('default="probe"', 'default="dlss"')
+    text = text.replace('default="probe"', 'default="dlss-fsr-framegen"')
     files['tools/build.py'] = text.encode('utf-8')
     return files
 

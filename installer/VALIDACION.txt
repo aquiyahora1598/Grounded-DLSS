@@ -1,3 +1,43 @@
+11.24.0 BETA — DLSS + FSR FRAME GENERATION (22/10/2026)
+
+F8: ACTIVAR / DESACTIVAR DLSS / DLAA
+F9: ACTIVAR / DESACTIVAR FSR FRAME GENERATION
+
+Interfaz y ayuda ES / EN / pt-BR; atajos grandes con color diferenciado.
+Proveedor AMD analitico 3.1.6 y presentacion 3.1.7, salida SDR.
+Dos DLL oficiales AMD firmados, intactos y con licencia original completa.
+No se incluye ni descarga DLL NVIDIA, Streamline, NVIDIA FG u OptiScaler.
+
+Pruebas del instalador en archivos aislados:
+- 9 casos nuevos: dependencias FG, ciclo instalar/actualizar/desinstalar,
+  migracion desde formato 3 a 4, INI personalizado conservado, archivos
+  ajenos/modificados preservados, rollback y atajos/licencia en tres idiomas.
+- 12 pruebas de idiomas, 16 de la opcion FSR y regresiones anteriores aprobadas.
+- Sin tocar el juego, sus ajustes reales ni partidas para esas pruebas.
+- Revision visual de los tres idiomas; F8/F9 resaltados y texto sin recortes.
+
+ASI recompilado: regresiones DLSS/SR con biblioteca NVIDIA local a 1080p,
+1440p y 4K aprobadas. La logica FG conserva la variante probada en el juego;
+se actualiza su identificacion de version. El backend de presentacion aislado
+paso 80 cuadros renderizados -> 160 Present nativos, apagado 20 -> 20,
+redimensionado 1080p/1440p/4K y liberacion de contextos, sin errores de callback.
+
+Sesion real: DLSS/DLAA + FG en RTX 4070 Laptop, 1080p y 1440p; F8/F9,
+pausa/reanudacion y cambio de resolucion. El usuario confirmo que funciona bien.
+Muestra 1440p DLAA: ~67 cuadros/s sin FG; ~101 Present/s con FG (~50 renderizados).
+Contadores DXGI de CPU, no scanout, latencia ni garantia de ganancia universal.
+4K se probo en fixtures independientes, no dentro del juego en esa sesion.
+
+Limites: SDR, validacion local de una GPU; posibles artefactos transitorios
+al entrar en pausa, detalle perdido en Ultra y evaluacion visual mas amplia.
+F8 apagado suspende FG; al reactivar DLSS vuelve FG si F9 seguia encendido.
+El FSR de escalado del menu debe quedar APAGADO y se configura automaticamente.
+La desinstalacion restaura esa seleccion y conserva otros ajustes del usuario.
+
+Se conservan los pendientes legales anteriores sin declararlos resueltos.
+Publicacion por solicitud expresa del autor. Ver LEGAL.md y licencias incluidas.
+
+----- HISTORIAL DE VERSIONES ANTERIORES -----
 VALIDACION 11.23.4 - INSTALADOR EN TRES IDIOMAS, 21/10/2026
 
 Interfaz, errores y registros en espanol, ingles y portugues de Brasil.

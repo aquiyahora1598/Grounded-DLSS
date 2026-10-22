@@ -1,3 +1,27 @@
+## Revisión actual 11.24.0: DLSS + FSR Frame Generation
+
+Publicación solicitada expresamente por el autor, conservando los pendientes
+anteriores sin marcarlos como resueltos. Esta solicitud no es una aprobación
+de NVIDIA, AMD ni los titulares del juego.
+
+Se agregan dos binarios AMD originales firmados: amd_fidelityfx_loader_dx12.dll
+y amd_fidelityfx_framegeneration_dx12.dll, del SDK 2.3.0 fijado en el commit
+60f4ea81909200d8542eca14dccb2628b763a9a3. Proveedor analítico 3.1.6, proxy 3.1.7.
+La licencia general del SDK permite redistribuir binarios con sus avisos;
+prohíbe descompilar o aplicar ingeniería inversa a esos componentes. No se
+analizaron sus binarios por ingeniería inversa. Los encabezados API utilizados
+figuran entre las excepciones bajo MIT. No debe describirse todo el SDK como MIT.
+
+Se conserva completa la [licencia oficial fijada](https://github.com/GPUOpen-LibrariesAndSDKs/FidelityFX-SDK/blob/v2.3.0/docs/license.md)
+en licenses/AMD-FidelityFX-SDK-LICENSE.txt, en la ayuda del instalador y en sus
+archivos instalados. Los DLL se incluyen intactos con hashes verificados.
+No se publican los encabezados SDK ni se incluyen marcas gráficas de AMD.
+La licencia MIT propia no relicencia componentes AMD/NVIDIA. No se agrega
+NVIDIA FG, Streamline, OptiScaler ni una DLL NVIDIA al paquete.
+
+Los apartados siguientes conservan el historial de revisiones anteriores;
+las frases sobre ausencia de FG describen esas versiones, no la 11.24.0.
+
 ## Revision actual 11.23.4: idiomas del instalador
 
 Se traduce la interfaz, los mensajes y los documentos propios al ingles y

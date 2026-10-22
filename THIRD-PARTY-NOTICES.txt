@@ -1,3 +1,14 @@
+AMD FIDELITYFX FRAME GENERATION (added in 11.24.0)
+Official FidelityFX SDK 2.3.0, tag commit 60f4ea81909200d8542eca14dccb2628b763a9a3.
+Analytical FG 3.1.6 and presentation proxy 3.1.7.
+amd_fidelityfx_loader_dx12.dll / amd_fidelityfx_framegeneration_dx12.dll
+Copyright (C) Advanced Micro Devices, Inc.
+These unchanged signed binaries use the SDK binary redistribution terms,
+not the project MIT license. The complete original license (including MIT
+exceptions for API headers) is included in AMD-FidelityFX-SDK-LICENSE.txt.
+Source: https://github.com/GPUOpen-LibrariesAndSDKs/FidelityFX-SDK/tree/v2.3.0
+No AMD logos, machine-learning upscaler or NVIDIA FG runtime are included.
+
 This software contains source code provided by NVIDIA Corporation.
 DLSS/NGX SDK components are governed by NVIDIA-RTX-SDK-LICENSE.txt, not the mod license.
 The NVIDIA DLSS runtime is NOT included, downloaded or installed as a backup by this package.

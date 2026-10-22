@@ -70,3 +70,7 @@ A desinstalação remove a cópia de trabalho própria e válida. Arquivos de
 terceiros ou alterados são preservados. Os backups de configuração permitem
 restaurar os ajustes anteriores e ficam separados da biblioteca de trabalho.
 Não é necessário aceitar uma nova licença para desinstalar ou recuperar uma operação.
+
+AMD FidelityFX SDK: os binários AMD incluídos mantêm sua própria licença.
+Leia AMD-FidelityFX-SDK-LICENSE.txt. A licença MIT do projeto não altera
+as licenças dos componentes AMD ou NVIDIA.

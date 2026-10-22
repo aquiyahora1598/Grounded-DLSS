@@ -68,3 +68,6 @@ Uninstall removes the valid, owned working copy. Unrelated or altered files
 are preserved. Configuration backups allow previous settings to be restored
 and remain separate from the working library. No new license acceptance is
 required to uninstall or recover an operation.
+
+AMD FidelityFX SDK: the bundled AMD binaries retain their own license.
+See AMD-FidelityFX-SDK-LICENSE.txt. The project MIT license does not relicense AMD or NVIDIA components.

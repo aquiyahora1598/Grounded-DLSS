@@ -87,7 +87,7 @@ class InstallerFsrTests {
    using(var f=File.OpenRead(stateFile))state=(State)xml.Deserialize(f);state.Format=2;
    using(var f=File.Create(stateFile))xml.Serialize(f,state);
    e.Install(Payload(),null);Check(Get(File.ReadAllText(menu))=="0","Old state not upgraded");
-   Check(File.ReadAllText(stateFile).Contains("<Format>3</Format>"),"Older installers would silently ignore FSR ownership");
+   Check(File.ReadAllText(stateFile).Contains("<Format>4</Format>"),"Older installers would silently ignore FSR/FG ownership");
    e.Uninstall();Check(Get(File.ReadAllText(menu))=="2","Migrated FSR preference not restored");
   });
   Case("fsr-failure-rolls-back-menu-engine-and-payload",(root,ini,e)=>{

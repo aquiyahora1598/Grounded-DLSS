@@ -20,7 +20,7 @@ class InstallerRuntimeTests {
   payload=new Dictionary<string,byte[]>(StringComparer.OrdinalIgnoreCase);
   using(var resource=typeof(Engine).Assembly.GetManifestResourceStream("payload.zip"))using(var zip=new ZipArchive(resource,ZipArchiveMode.Read))foreach(var entry in zip.Entries){using(var m=new MemoryStream()){using(var source=entry.Open())source.CopyTo(m);payload.Add(entry.FullName.Replace('/','\\'),m.ToArray());}}
   Case("no-runtime-or-downloader-embedded",()=>{
-   Check(!payload.ContainsKey(Engine.Allowed[3])&&payload.Count==12,"Unexpected NVIDIA runtime or package entries");
+   Check(!payload.ContainsKey(Engine.Allowed[3])&&payload.Count==15,"Unexpected NVIDIA runtime or package entries");
    Check(typeof(Engine).Assembly.GetType("GroundedDLSSSetup.NvidiaDownload")==null&&typeof(Engine).Assembly.GetType("GroundedDLSSSetup.NvidiaRuntime")==null,"Legacy downloader/import API retained");
   });
   string game=Path.Combine(home,"game"),ini=Path.Combine(home,"config","Engine.ini");
@@ -37,7 +37,7 @@ class InstallerRuntimeTests {
    e.Uninstall();Check(File.ReadAllBytes(ini).SequenceEqual(before)&&!File.Exists(Path.Combine(game,Engine.Allowed[0])),"Uninstall failed to restore configuration");Check(File.Exists(official),"NVIDIA source removed");
   });
   Case("license-resources-and-default-consent",()=>{
-   foreach(string ending in new[]{"TERMINOS.txt","LICENSE.txt","NVIDIA-RTX-SDK-LICENSE.txt","THIRD-PARTY-NOTICES.txt"})Check(payload.Keys.Any(k=>k.EndsWith("\\"+ending,StringComparison.Ordinal)),"Missing license: "+ending);
+   foreach(string ending in new[]{"TERMINOS.txt","LICENSE.txt","NVIDIA-RTX-SDK-LICENSE.txt","AMD-FidelityFX-SDK-LICENSE.txt","THIRD-PARTY-NOTICES.txt"})Check(payload.Keys.Any(k=>k.EndsWith("\\"+ending,StringComparison.Ordinal)),"Missing license: "+ending);
    Application.EnableVisualStyles();using(var form=new SetupForm()){
     Check(form.Controls.OfType<CheckBox>().Single().Checked==false,"Acceptance preselected");
     Check(!form.Controls.OfType<Button>().Any(b=>b.Text.IndexOf("descarga",StringComparison.OrdinalIgnoreCase)>=0||b.Text.Contains("DLL")),"Download or manual DLL picker retained");

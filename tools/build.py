@@ -8,7 +8,7 @@ import shutil
 import sys
 
 ROOT = Path(__file__).resolve().parents[1]
-TARGETS = {'local-runtime-test': ('tests/local_runtime.cpp', 'local-runtime-test.exe', False), 'loader-compat': ('tests/loader_compat.cpp', 'loader-compat.exe', False), 'loader-early': ('tests/loader_early.cpp', 'loader-early.exe', False), 'focus-abi-test': ('tests/focus_abi.cpp', 'focus-abi-test.exe', False), 'focus-time-test': ('tests/focus_time.cpp', 'focus-time-test.exe', False), 'loader': ('src/loader/dxgi_proxy.cpp', 'dxgi.dll', True), 'loader-smoke': ('tests/loader_smoke.cpp', 'loader-smoke.exe', False), 'scale-presets': ('tests/scale_presets.cpp', 'scale-presets.exe', False), 'viewport-scale': ('tests/viewport_scale.cpp', 'viewport-scale.exe', False), 'sharpness-control': ('tests/sharpness_control.cpp', 'sharpness-control.exe', False), 'preset-policy': ('tests/preset_policy.cpp', 'preset-policy.exe', False), 'native-temporal-probe-test': ('tests/native_temporal_bridge.cpp', 'native-temporal-probe-test.exe', False), 'dlss': ('src/grounded/runtime.cpp', 'GroundedDLSS.asi', True)}
+TARGETS = {'framegen-camera-test': ('tests/framegen_camera.cpp', 'framegen-camera-test.exe', False), 'dlss-fsr-framegen': ('src/grounded/runtime.cpp', 'GroundedDLSS.asi', True), 'framegen-fsr-present': ('tests/framegen_fsr_present.cpp', 'framegen-fsr-present.exe', False), 'framegen-fsr-dispatch': ('tools/framegen_fsr_dispatch.cpp', 'framegen-fsr-dispatch.exe', False), 'local-runtime-test': ('tests/local_runtime.cpp', 'local-runtime-test.exe', False), 'loader-compat': ('tests/loader_compat.cpp', 'loader-compat.exe', False), 'loader-early': ('tests/loader_early.cpp', 'loader-early.exe', False), 'focus-abi-test': ('tests/focus_abi.cpp', 'focus-abi-test.exe', False), 'focus-time-test': ('tests/focus_time.cpp', 'focus-time-test.exe', False), 'loader': ('src/loader/dxgi_proxy.cpp', 'dxgi.dll', True), 'loader-smoke': ('tests/loader_smoke.cpp', 'loader-smoke.exe', False), 'scale-presets': ('tests/scale_presets.cpp', 'scale-presets.exe', False), 'viewport-scale': ('tests/viewport_scale.cpp', 'viewport-scale.exe', False), 'sharpness-control': ('tests/sharpness_control.cpp', 'sharpness-control.exe', False), 'preset-policy': ('tests/preset_policy.cpp', 'preset-policy.exe', False), 'native-temporal-probe-test': ('tests/native_temporal_bridge.cpp', 'native-temporal-probe-test.exe', False), 'dlss': ('src/grounded/runtime.cpp', 'GroundedDLSS.asi', True)}
 
 
 def find_vcvars():
@@ -25,7 +25,7 @@ def find_vcvars():
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("target", choices=TARGETS, nargs="?", default="dlss")
+    parser.add_argument("target", choices=TARGETS, nargs="?", default="dlss-fsr-framegen")
     args = parser.parse_args()
     vcvars = find_vcvars()
     if not vcvars.is_file():
@@ -44,6 +44,11 @@ def main():
         for suffix in (".lib", ".exp"):
             output.with_suffix(suffix).unlink(missing_ok=True)
     command = ["cl.exe", "/nologo", "/std:c++17", "/O2", "/EHsc", "/W4", "/DWIN32_LEAN_AND_MEAN", "/DNOMINMAX"]
+    if args.target == "framegen-nvidia-check":
+        command += [f"/I{ROOT / 'external/framegen/streamline-2.14.16/include'}"]
+    if args.target in ("framegen-fsr-check", "framegen-fsr-dispatch", "dlss-fsr-framegen", "framegen-fsr-present"):
+        command += [f"/I{ROOT / 'external/framegen/fsr-2.3.0/Kits/FidelityFX/api/include'}",
+                    f"/I{ROOT / 'external/framegen/fsr-2.3.0/Kits/FidelityFX/framegeneration/include'}"]
     if args.target == "renderdoc-api":
         command.append("/DRENDERDOC_PLATFORM_WIN32")
         import pefile
@@ -77,8 +82,16 @@ def main():
         command.append("/DGROUNDED_NATIVE_BRIDGE_TEST")
     if args.target == "dlss-capture":
         command.append("/DGROUNDED_FRAME_CAPTURE")
+    if args.target in ("dlss-framegen-probe", "dlss-framegen-scene-probe", "dlss-framegen-color-capture", "dlss-fsr-framegen"):
+        command.append("/DGROUNDED_FRAMEGEN_PROBE")
+    if args.target in ("dlss-framegen-scene-probe", "dlss-framegen-color-capture", "dlss-fsr-framegen"):
+        command.append("/DGROUNDED_FRAMEGEN_SCENE_PROBE")
+    if args.target == "dlss-framegen-color-capture":
+        command.append("/DGROUNDED_FRAMEGEN_COLOR_CAPTURE")
+    if args.target == "dlss-fsr-framegen":
+        command.append("/DGROUNDED_FSR_FRAMEGEN")
     sources = [str(ROOT / source)]
-    if args.target in ('dlss', 'dlss-native-test', 'dlss-capture', 'focus-abi-test'):
+    if args.target in ('dlss', 'dlss-native-test', 'dlss-capture', 'dlss-framegen-probe', 'dlss-framegen-scene-probe', 'dlss-framegen-color-capture', 'dlss-fsr-framegen', 'focus-abi-test'):
         obj = output_dir / 'focus_step.obj'
         assemble = ['ml64.exe', '/nologo', '/c', f'/Fo{obj}', str(ROOT / 'src/grounded/focus_step.asm')]
         subprocess.run(f'call "{vcvars}" >nul && {subprocess.list2cmdline(assemble)}', shell=True, cwd=output_dir, check=True)
@@ -97,7 +110,7 @@ def main():
     if args.target == "probe":
         sources.append(str(ROOT / "src/render_probe/feedback.cpp"))
         sources.append(str(ROOT / "src/render_probe/vtable_abi.cpp"))
-    if args.target in ("dlss", "dlss-native-test", "dlss-capture", "dlss-smoke", "dlss-gpu"):
+    if args.target in ("dlss", "dlss-native-test", "dlss-capture", "dlss-framegen-probe", "dlss-framegen-scene-probe", "dlss-framegen-color-capture", "dlss-fsr-framegen", "dlss-smoke", "dlss-gpu"):
         sources.append(str(ROOT / "src/grounded/integration.cpp"))
     command += sources + [f"/Fo{output_dir.as_posix()}/", f"/Fe{output}", "d3d12.lib", "dxgi.lib", "user32.lib", "gdi32.lib", "d3dcompiler.lib", "/link", "/INCREMENTAL:NO"]
     if args.target == 'loader':
