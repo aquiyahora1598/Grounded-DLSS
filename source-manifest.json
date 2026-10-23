@@ -76,7 +76,8 @@
   "src/grounded/native_temporal_signatures.h": "ee2d3f478ef174c3e110d3a1dce05c4c5694bac3f29160520fe6cdf94b83b2e6",
   "src/grounded/frame_capture.h": "0ba781eab83a82d8f15330ee59899974f147145201a59e8cc349bb0990320946",
   "src/grounded/local_dlss.h": "15a1ec01bc407b11930ff0df04d7e5d7b372bba0c9c5e4175797523e3d59e48a",
-  "README.md": "24fe5ad3e69c151c127649d022c921aacc194b4c91fa52bec593b3ce1c9b44da",
+  "README.md": "1d85204cc74008fb25a22e99d0b75fafe289c28da8035bcd658d5457ff5fb9d1",
   "LEGAL.md": "dc724901c9fa41e5480d6689beef2fb01bd2fb157bd15197feebaed833926a1e",
-  "THIRD-PARTY-NOTICES.txt": "8f1cfe6f1b392843de80d9b7fabb29550d4bc225ababf75b4b4ced04e5aade48"
+  "THIRD-PARTY-NOTICES.txt": "8f1cfe6f1b392843de80d9b7fabb29550d4bc225ababf75b4b4ced04e5aade48",
+  "SECURITY.md": "3ede983cce027e11f2af4232af1c34e024d234f8835cff2897d1f0dd5555ffc0"
 }

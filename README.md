@@ -1,5 +1,27 @@
 # Grounded DLSS + FSR Frame Generation
 
+<!-- antivirus-notice-11.24.0 -->
+> [!WARNING]
+> **Antivirus / Security / Segurança — 11.24.0 Beta · 23/10/2026**
+>
+> **ES:** Se reportó un bloqueo de Defender como `Trojan:Win32/Sabsik.FL.A!ml`.
+> **VirusTotal: 9/70 motores lo marcaron.** Puede haber falsos positivos, pero
+> todavía no están confirmados; la revisión solicitada a Microsoft sigue sin dictamen.
+> Si el antivirus lo bloquea, mantenelo bloqueado: no desactives la protección ni añadas exclusiones.
+>
+> **EN:** Defender blocks have been reported. **VirusTotal: 9/70 detections.**
+> False positives are possible but unconfirmed; a Microsoft review has been requested.
+> Keep blocked files blocked. Do not disable protection or add exclusions.
+>
+> **PT-BR:** Foram relatados bloqueios do Defender. **VirusTotal: 9/70 detecções.**
+> Possíveis falsos positivos ainda não foram confirmados; foi solicitada revisão à Microsoft.
+> Mantenha o arquivo bloqueado. Não desative a proteção nem adicione exclusões.
+>
+> [**Ver informe completo de VirusTotal / Full report / Relatório completo**](https://www.virustotal.com/gui/file/88db9f4431bea059adf86b9825abb1c2fde18edf6eb5e1930bd4508198edf485/detection)
+> · [**Detalles, hash y estado / Details / Detalhes**](https://github.com/aquiyahora1598/Grounded-DLSS/blob/main/SECURITY.md).
+> El resultado corresponde al instalador exacto y no certifica su seguridad / This is not a safety certificate / Não é um certificado de segurança.
+<!-- /antivirus-notice-11.24.0 -->
+
 **11.24.0 Beta · Español / English / Português (Brasil)**
 
 ## F8 — DLSS / DLAA ON ↔ OFF
