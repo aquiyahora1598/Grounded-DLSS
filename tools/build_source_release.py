@@ -32,6 +32,7 @@ def source_files():
         'tests/focus_abi.asm', 'tests/native_temporal_bridge.cpp',
         'tests/loader_compat.cpp', 'tests/loader_early.cpp', 'tests/loader_smoke.cpp']
     names += ['installer/PayloadPackage.cs', 'installer/PackageIdentity.cs', 'tools/build_installer_b.py', 'tests/installer_payload.cs', 'README.md', 'CHANGELOG.md', 'SECURITY.md', 'INSTALLER_B.md', 'docs/INSTALLER_B_VALIDATION.md', 'publication/README.md', 'publication/RELEASE_NOTES-11.24.1.md']
+    names += ['README.es.md', 'README.pt-BR.md', 'INSTALLER_B.es.md', 'INSTALLER_B.pt-BR.md', 'SECURITY.es.md', 'SECURITY.pt-BR.md', 'publication/RELEASE_NOTES-11.24.1.es.md', 'publication/RELEASE_NOTES-11.24.1.pt-BR.md', 'assets/languages/en.svg', 'assets/languages/en-selected.svg', 'assets/languages/es.svg', 'assets/languages/es-selected.svg', 'assets/languages/pt-BR.svg', 'assets/languages/pt-BR-selected.svg']
     names += ['src/grounded/' + name + '.h' for name in headers]
     files = {name: (ROOT / name).read_bytes() for name in names}
     files['README.md'] = (ROOT / 'README.md').read_bytes()

@@ -1,73 +1,45 @@
-# Installer B — 11.24.1 Beta
+# Full installation and update guide
 
-## Español
+[![English](assets/languages/en-selected.svg)](INSTALLER_B.md) [![Español](assets/languages/es.svg)](INSTALLER_B.es.md) [![Português (Brasil)](assets/languages/pt-BR.svg)](INSTALLER_B.pt-BR.md)
 
-1. Cerrá Grounded normalmente.
-2. Descargá **GroundedDLSS-11.24.1-beta.zip** y extraé **todo** su contenido.
-3. Abrí `GroundedDLSS-11.24.0-beta-B-verified-sidecar-Setup.exe`.
-   Dejá `GroundedDLSS-payload.zip` al lado del EXE, sin extraer el ZIP interno.
-4. Elegí tu idioma y la carpeta Grounded que contiene `Grounded.exe`.
-5. Leé los términos y licencias. Si aceptás, usá **Instalar / actualizar**.
-6. Iniciá Grounded con DirectX 12. Para empezar, usá escala 67 % (Calidad).
+**11.24.1 Beta · Installer B**
 
-**F8: DLSS / DLAA. F9: FSR Frame Generation.** Ambos inician activados.
-Apagar DLSS suspende FG; vuelve al reactivar DLSS si F9 seguía encendido.
-El escalado FSR del menú debe permanecer apagado; el instalador lo apaga.
-Escalas: 100 DLAA, 67 Calidad, 58 Equilibrado, 50 Rendimiento, 33 Ultra.
+> [!WARNING]
+> **Antivirus detections remain.** On 24 October 2026, the installer EXE had **5/70 detections** and the full ZIP **2/65**, with different coverage. These are dated results, not security clearance. If blocked, keep the file blocked; do not disable protection or add exclusions.
+>
+> [Security details and VirusTotal reports](SECURITY.md).
 
-Para desinstalar, cerrá el juego y abrí el mismo EXE o
-`Maine/Binaries/Win64/GroundedDLSS-install/Desinstalar Grounded DLSS.exe`.
-La desinstalación, recuperación y ayuda funcionan sin el ZIP acompañante.
-Para instalar o actualizar sí necesitás el paquete completo. Conservá una copia.
-No ejecutes antiguos selectores BAT de pruebas sobre una instalación nueva.
+## Install
 
-## English
+1. Close Grounded normally.
+2. Download **GroundedDLSS-11.24.1-beta.zip** and extract **all** files into a folder.
+3. Run `GroundedDLSS-11.24.0-beta-B-verified-sidecar-Setup.exe`. Keep **GroundedDLSS-payload.zip beside the EXE**, without extracting the inner ZIP.
+4. Choose your language and the Grounded folder containing `Grounded.exe`. Read the terms and licenses; if you agree, choose **Install / update**.
+5. Launch Grounded with DirectX 12. Start with **67%** resolution scale for Quality.
 
-Close Grounded. Download **GroundedDLSS-11.24.1-beta.zip**, extract **all** files,
-and run the included Setup. Keep **GroundedDLSS-payload.zip next to the EXE**;
-do not extract the inner ZIP. Select your language and the Grounded folder,
-read the terms and licenses, then choose **Install / update** if you agree.
-Start Grounded with DirectX 12. Try 67% resolution scale for Quality.
+## Controls
 
-**F8 toggles DLSS/DLAA; F9 toggles FSR Frame Generation.** Both start enabled.
-Turning DLSS off suspends FG. Keep the in-game AMD FSR upscaler off.
-To uninstall, close the game and use the same Setup or the installed uninstaller
-in `Maine/Binaries/Win64/GroundedDLSS-install`. Removal, recovery and help work
-without the sidecar ZIP; installing/updating requires the complete extracted package.
+| | |
+| --- | --- |
+| **F8 · DLSS / DLAA** | Enable or disable DLSS / DLAA |
+| **F9 · FSR Frame Generation** | Enable or disable FSR Frame Generation |
 
-## Português (Brasil)
+Both start enabled. Use F9 to compare Frame Generation alone. Turning DLSS off with F8 suspends Frame Generation; it resumes when DLSS is enabled again if F9 remained on.
 
-Feche o Grounded. Baixe **GroundedDLSS-11.24.1-beta.zip**, extraia **todos** os
-arquivos e execute o instalador incluído. Mantenha **GroundedDLSS-payload.zip
-ao lado do EXE**, sem extrair o ZIP interno. Escolha o idioma e a pasta Grounded,
-leia os termos e as licenças e, se concordar, clique em **Instalar / atualizar**.
-Inicie com DirectX 12. Comece com escala 67% para Qualidade.
+**Keep the in-game AMD FSR upscaler OFF.** The installer switches it off automatically. Frame Generation is controlled separately with F9.
 
-**F8 alterna DLSS/DLAA; F9 alterna FSR Frame Generation.** Ambos iniciam ativados.
-Desativar DLSS suspende FG. Mantenha o escalonamento AMD FSR do menu desativado.
-Para desinstalar, feche o jogo e use o mesmo instalador ou o desinstalador em
-`Maine/Binaries/Win64/GroundedDLSS-install`. Desinstalação, recuperação e ajuda
-funcionam sem o ZIP adicional; instalar/atualizar exige o pacote completo extraído.
+## Update or reinstall
 
-## Identity / Identidad / Identidade
+With Grounded closed, extract the complete package and use **Install / update**. Retain both the EXE and its sidecar ZIP. Do not use the old research BAT mode selectors with a new installation. Uninstall preserves unrelated settings and user-modified files.
 
-11.24.1 is a packaging/installer update. Rendering remains 11.24.0.
-The release ZIP is byte-identical to the B ZIP tested in VirusTotal; only its
-download filename changed. The inner EXE retains its tested filename/version.
-The installer verifies the complete sidecar's size and SHA-256 before reading it,
-on the same stream locked against writes. It embeds documentation for offline help.
-No NVIDIA runtime is bundled or downloaded. The signed AMD FG DLLs remain included.
-The small installer is unsigned. Dated antivirus detections remain in [SECURITY.md](SECURITY.md).
-The historical PRIVATE SECURITY EXPERIMENT label inside the unchanged ZIP identifies
-the tested sample; this beta is now distributed at the author's request.
+## Uninstall
 
-## Build
+Close Grounded and choose **Uninstall** in the same installer, or run `Desinstalar Grounded DLSS.exe` in `Maine/Binaries/Win64/GroundedDLSS-install`. The external ZIP is not needed for uninstall, recovery or help. Keep the complete package for future installation or updates.
 
-Build the runtime/dependencies as described in README, then run
-`python tools/build_release.py`. It creates the external payload and a matching
-installer. Alternatively, `tools/build_installer_b.py --payload <payload.zip>
---output <Setup.exe>` builds from an existing allowed 15-file payload.
-`installer/PackageIdentity.cs` records the reviewed payload's original identity;
-the builder generates a fresh identity for the payload it actually packages.
-Rebuilt executables need their own hashes/reports; bit-for-bit reproducibility
-is not claimed for this classic compiler. Publication clearance gates remain intact.
+## Package identity
+
+**11.24.1 updates the installer and distribution; rendering remains 11.24.0.** The download contains the exact tested B files. The inner EXE intentionally retains its tested filename and version.
+
+A missing, truncated or modified sidecar ZIP is refused. The complete ZIP is checked against a size and SHA-256 bound into the installer, using the same stream locked against writes. Help and licenses are embedded for offline access.
+
+[Build from source](README.md) · [Security details and VirusTotal reports](SECURITY.md).
