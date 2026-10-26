@@ -18,7 +18,7 @@ class InstallerRuntimeTests {
   Console.OutputEncoding=new UTF8Encoding(false);I18n.SetLanguage("es");home=Path.GetFullPath(args[0]);official=Path.GetFullPath(args[1]);
   Check(!Directory.Exists(home),"Fresh fixture required");Directory.CreateDirectory(home);
   payload=new Dictionary<string,byte[]>(StringComparer.OrdinalIgnoreCase);
-  using(var resource=typeof(Engine).Assembly.GetManifestResourceStream("payload.zip"))using(var zip=new ZipArchive(resource,ZipArchiveMode.Read))foreach(var entry in zip.Entries){using(var m=new MemoryStream()){using(var source=entry.Open())source.CopyTo(m);payload.Add(entry.FullName.Replace('/','\\'),m.ToArray());}}
+  using(var resource=PayloadPackage.OpenInstall())using(var zip=new ZipArchive(resource,ZipArchiveMode.Read))foreach(var entry in zip.Entries){using(var m=new MemoryStream()){using(var source=entry.Open())source.CopyTo(m);payload.Add(entry.FullName.Replace('/','\\'),m.ToArray());}}
   Case("no-runtime-or-downloader-embedded",()=>{
    Check(!payload.ContainsKey(Engine.Allowed[3])&&payload.Count==15,"Unexpected NVIDIA runtime or package entries");
    Check(typeof(Engine).Assembly.GetType("GroundedDLSSSetup.NvidiaDownload")==null&&typeof(Engine).Assembly.GetType("GroundedDLSSSetup.NvidiaRuntime")==null,"Legacy downloader/import API retained");

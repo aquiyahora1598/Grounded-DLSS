@@ -11,7 +11,7 @@ class InstallerCacheTests {
  static void Check(bool value,string why){if(!value)throw new Exception(why);}
  static void Refused(Action action){bool ok=false;try{action();}catch(IOException){ok=true;}Check(ok,"Expected refusal");}
  static void Case(string name,Action action){try{action();Console.WriteLine("PASS "+name);}catch(Exception ex){++failed;Console.WriteLine("FAIL "+name+": "+ex.Message);}}
- static Dictionary<string,byte[]> Payload(){var p=new Dictionary<string,byte[]>(StringComparer.OrdinalIgnoreCase);using(var s=typeof(Engine).Assembly.GetManifestResourceStream("payload.zip"))using(var z=new ZipArchive(s,ZipArchiveMode.Read))foreach(var x in z.Entries)using(var m=new MemoryStream()){using(var f=x.Open())f.CopyTo(m);p.Add(x.FullName.Replace('/','\\'),m.ToArray());}return p;}
+ static Dictionary<string,byte[]> Payload(){var p=new Dictionary<string,byte[]>(StringComparer.OrdinalIgnoreCase);using(var s=PayloadPackage.OpenInstall())using(var z=new ZipArchive(s,ZipArchiveMode.Read))foreach(var x in z.Entries)using(var m=new MemoryStream()){using(var f=x.Open())f.CopyTo(m);p.Add(x.FullName.Replace('/','\\'),m.ToArray());}return p;}
  static void Legacy(string root,byte[] data,bool alter){
   string state=Path.Combine(root,@"Maine\Binaries\Win64\GroundedDLSS-install\state.xml");var serializer=new XmlSerializer(typeof(State));State s;using(var f=File.OpenRead(state))s=(State)serializer.Deserialize(f);
   s.Items.Add(new Item{Path=Engine.Allowed[3],Hash=Safe.Hash(data),Active=true});using(var f=File.Create(state))serializer.Serialize(f,s);

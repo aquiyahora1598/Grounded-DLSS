@@ -14,6 +14,9 @@ namespace GroundedDLSSSetup {
   public static bool Contains(string text){return translations.ContainsKey(Original(text));}
   public static IEnumerable<string> Keys {get{return translations.Keys;}}
   static readonly Dictionary<string,string[]> translations=new Dictionary<string,string[]>(StringComparer.Ordinal){
+ {"El paquete de instalación está incompleto o fue modificado.",new[]{"The installation package is incomplete or has been changed.","O pacote de instalação está incompleto ou foi alterado."}},
+ {"Para instalar o actualizar, extraé el ZIP completo y ejecutá su instalador. Para desinstalar o recuperar no hace falta el paquete.",new[]{"To install or update, extract the complete ZIP and run its installer. Uninstall and recovery do not require the package.","Para instalar ou atualizar, extraia o ZIP completo e execute o instalador. A desinstalação e a recuperação não precisam do pacote."}},
+
    {"F8  ·  ACTIVAR / DESACTIVAR DLSS / DLAA",new[]{"F8  ·  ENABLE / DISABLE DLSS / DLAA","F8  ·  ATIVAR / DESATIVAR DLSS / DLAA"}},
    {"F9  ·  ACTIVAR / DESACTIVAR FSR FRAME GENERATION",new[]{"F9  ·  ENABLE / DISABLE FSR FRAME GENERATION","F9  ·  ATIVAR / DESATIVAR FSR FRAME GENERATION"}},
    {"AMD FidelityFX SDK (inglés original)",new[]{"AMD FidelityFX SDK (original English)","AMD FidelityFX SDK (inglês original)"}},

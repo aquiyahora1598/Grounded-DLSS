@@ -1,5 +1,20 @@
 # Changes
 
+## 11.24.1 beta — Installer B
+
+- Small installer with an external payload ZIP, bound by size and SHA-256 and read
+  through the same write-locked stream. Missing/changed/truncated packages are refused.
+- Embedded help/licenses and uninstall/recovery without the original sidecar ZIP.
+- Full ZIP distribution and clearer ES/EN/pt-BR installation/update/removal guidance.
+- Publishes the exact reviewed/tested B ZIP and unchanged 11.24.0 rendering payload.
+- Documents remaining dated antivirus detections, hashes and real-game F8/F9 tests.
+
+## 11.24.0 beta
+
+- Adds analytical AMD FSR Frame Generation. F8 toggles DLSS/DLAA; F9 toggles FG.
+- Includes signed AMD dependencies; no OptiScaler, NVIDIA FG or NVIDIA runtime DLL.
+- See README and SECURITY for requirements, testing limits and antivirus reports.
+
 ## 11.23.4 beta
 
 - Installer UI, messages and logs in Spanish, English and Brazilian Portuguese.

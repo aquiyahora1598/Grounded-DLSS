@@ -1,3 +1,41 @@
+# Antivirus status for 11.24.1 Beta / Installer B
+
+This packaging update publishes the **exact tested B binaries**. It is not a
+claim that the antivirus issue has been resolved. Observations below were recorded
+on **24 October 2026**; they have not been refreshed for this release and can change.
+
+| Sample | SHA-256 | Observed result | Microsoft in that report |
+| --- | --- | --- | --- |
+| Full download ZIP | `86ccb82a12ecdf8f5ae5fdd57aebd40e0ac5a9d950f705673cb88d039edca6b4` | 2/65 | Undetected |
+| EXE inside ZIP | `c7945b4333058cb4eab0817eb210296bbb294d1c2d37cec001a0e5034d66a4ca` | 5/70 | Undetected |
+| Inner payload ZIP | `d965884af71330028edfd17fdd4883e4fe678aa2621601aa81194ae674ba5e04` | No separate VT result claimed | No separate result claimed |
+
+[Full ZIP report](https://www.virustotal.com/gui/file/86ccb82a12ecdf8f5ae5fdd57aebd40e0ac5a9d950f705673cb88d039edca6b4/detection) ·
+[EXE report](https://www.virustotal.com/gui/file/c7945b4333058cb4eab0817eb210296bbb294d1c2d37cec001a0e5034d66a4ca/detection).
+
+The two counts have different coverage. **2/65 does not cancel the five alerts on
+the enclosed EXE.** Bkav and Elastic flagged the full ZIP; the EXE also had
+CrowdStrike, McAfee and SecureAge detections. A clean Microsoft result in VirusTotal
+does not guarantee no Defender block elsewhere. Local Defender found no threats
+with signatures 1.461.188.0, but that is not independent clearance or a safety certificate.
+
+**ES:** Persisten detecciones; los posibles falsos positivos no están confirmados.
+Si se bloquea, mantenelo bloqueado y reportá versión, hash y nombre de detección.
+No desactives la protección ni añadas exclusiones.
+**EN:** Detections remain; possible false positives are unconfirmed. Keep blocked
+files blocked. Do not disable protection or add exclusions.
+**PT-BR:** As detecções continuam; possíveis falsos positivos não foram confirmados.
+Mantenha arquivos bloqueados. Não desative a proteção nem adicione exclusões.
+
+The original Microsoft submission's last recorded state was In progress on
+24 October. No later analyst verdict or vendor clearance is claimed here.
+See [functional validation](docs/INSTALLER_B_VALIDATION.md) for what was actually tested.
+Integrity checks and game tests do not determine whether an antivirus verdict is correct.
+
+---
+
+# Historical report for the previous 11.24.0 installer
+
 # Antivirus / Security / Segurança
 
 ## Aviso para 11.24.0 Beta — 23/10/2026

@@ -31,25 +31,14 @@ def source_files():
         'tests/preset_policy.cpp', 'tests/focus_time.cpp', 'tests/focus_abi.cpp',
         'tests/focus_abi.asm', 'tests/native_temporal_bridge.cpp',
         'tests/loader_compat.cpp', 'tests/loader_early.cpp', 'tests/loader_smoke.cpp']
+    names += ['installer/PayloadPackage.cs', 'installer/PackageIdentity.cs', 'tools/build_installer_b.py', 'tests/installer_payload.cs', 'README.md', 'CHANGELOG.md', 'SECURITY.md', 'INSTALLER_B.md', 'docs/INSTALLER_B_VALIDATION.md', 'publication/README.md', 'publication/RELEASE_NOTES-11.24.1.md']
     names += ['src/grounded/' + name + '.h' for name in headers]
     files = {name: (ROOT / name).read_bytes() for name in names}
-    files['README.md'] = (ROOT / 'publication/README.md').read_bytes()
-    files['LEGAL.md'] = (ROOT / 'publication/LEGAL.md').read_bytes()
-    files['THIRD-PARTY-NOTICES.txt'] = (ROOT / 'installer/THIRD-PARTY-NOTICES.txt').read_bytes()
-    # The public build entry point offers only included targets. Research targets
-    # are not part of the release and must not point at nonpublished tools.
-    allowed = {'local-runtime-test', 'loader', 'dlss', 'scale-presets', 'viewport-scale', 'sharpness-control',
-               'dlss-fsr-framegen', 'framegen-camera-test', 'framegen-fsr-present', 'framegen-fsr-dispatch',
-               'preset-policy', 'focus-time-test', 'focus-abi-test',
-               'native-temporal-probe-test', 'loader-compat', 'loader-early', 'loader-smoke'}
-    import build
-    selected = {name: spec for name, spec in build.TARGETS.items() if name in allowed}
-    text = files['tools/build.py'].decode('utf-8').replace('\r\n', '\n')
-    start = text.index('TARGETS = {')
-    end = text.index('\n\n\ndef find_vcvars', start)
-    text = text[:start] + 'TARGETS = ' + repr(selected) + text[end:]
-    text = text.replace('default="probe"', 'default="dlss-fsr-framegen"')
-    files['tools/build.py'] = text.encode('utf-8')
+    files['README.md'] = (ROOT / 'README.md').read_bytes()
+    files['LEGAL.md'] = (ROOT / 'LEGAL.md').read_bytes()
+    files['THIRD-PARTY-NOTICES.txt'] = (ROOT / 'THIRD-PARTY-NOTICES.txt').read_bytes()
+    # This public checkout already contains only the supported build targets.
+    # Preserve source bytes so archives match the published commit exactly.
     return files
 
 def main():

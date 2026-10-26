@@ -3,7 +3,7 @@ from pathlib import Path
 import argparse, hashlib, json, subprocess, zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSION = '11.24.0-beta'
+VERSION = '11.24.1-beta'
 RUNTIME_VERSION = '11.24.0-beta'
 RUNTIME_TARGET = 'dlss-fsr-framegen'
 
@@ -62,12 +62,8 @@ def main():
                 raise RuntimeError('NVIDIA runtime must not be embedded')
             z.writestr(name, source.read_bytes())
     setup = out / ('GroundedDLSS-' + VERSION + '-Setup.exe')
-    compiler = Path(r'C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe')
-    subprocess.run([str(compiler), '/nologo', '/target:winexe', '/platform:x64', '/optimize+',
-        f'/out:{setup}', f'/win32manifest:{ROOT / "installer/app.manifest"}',
-        f'/resource:{payload},payload.zip', '/r:System.Windows.Forms.dll',
-        '/r:System.Drawing.dll', '/r:System.IO.Compression.dll',
-        '/r:System.IO.Compression.FileSystem.dll', str(ROOT / 'installer/Setup.cs'), str(ROOT / 'installer/LocalRuntime.cs'), str(ROOT / 'installer/I18n.cs')], check=True)
+    from build_installer_b import build_installer
+    sidecar = build_installer(payload, setup)
     records = {name: {'sha256': sha(source), 'bytes': source.stat().st_size}
                for name, source in files.items()}
     manifest = {'version': VERSION, 'runtime_version': RUNTIME_VERSION, 'files': records,
@@ -77,6 +73,7 @@ def main():
         'optiscaler_included': False, 'nvidia_runtime_included': False,
         'frame_generation': {'provider': 'AMD FSR 3.1.6 analytical', 'swapchain': '3.1.7',
                              'enabled_by_default': True, 'toggle': 'F9', 'sdr_only': True},
+        'installer_layout': 'verified-sidecar', 'payload_sha256': sha(sidecar),
         'dlss_toggle': 'F8', 'amd_binaries_included': amd,
         'nvidia_runtime_source': 'local NVIDIA NGX cache or active driver package only',
         'downloads_supported': False, 'backup_libraries_installed': False,
@@ -84,7 +81,7 @@ def main():
         'nvidia_sdk_commit': '374959484e79a640feaba44c93ac8cfb0a03f5b5',
         'game_validation': 'VALIDACION.txt; beta limitations in LEEME.txt'}
     (out / 'package-manifest.json').write_text(json.dumps(manifest, indent=2) + '\n', encoding='utf-8')
-    public = [setup, out / 'package-manifest.json']
+    public = [setup, sidecar, out / 'package-manifest.json']
     documents.update({'VALIDACION.txt': ROOT / 'installer/VALIDACION.txt',
                       'LEGAL.md': ROOT / 'publication/LEGAL.md'})
     for name, source in documents.items():

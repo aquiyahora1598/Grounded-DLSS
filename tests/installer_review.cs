@@ -22,7 +22,7 @@ class InstallerReviewTests {
  static int Main(string[] args){
   Console.OutputEncoding=new UTF8Encoding(false);
   home=Path.GetFullPath(args[0]);if(Directory.Exists(home))throw new Exception("Fresh fixture directory required");
-  if(args.Length>1)using(var stream=typeof(Engine).Assembly.GetManifestResourceStream("payload.zip")){
+  if(args.Length>1)using(var stream=PayloadPackage.OpenInstall()){
    Check(stream!=null,"Packaged installer has no embedded payload");using(var memory=new MemoryStream()){stream.CopyTo(memory);Check(memory.ToArray().SequenceEqual(File.ReadAllBytes(args[1])),"Embedded payload differs from the release package");}
   }
   Case("repeat-uninstall-preserves-encoding",(root,ini,e)=>{

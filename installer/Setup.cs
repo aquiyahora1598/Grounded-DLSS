@@ -345,7 +345,7 @@ namespace GroundedDLSSSetup {
    var view=new Form {Text=I18n.T("Ayuda, términos, licencias y atribuciones"),Width=820,Height=650,StartPosition=FormStartPosition.CenterParent};
    try {
     var tabs=new TabControl {Dock=DockStyle.Fill};view.Controls.Add(tabs);
-    using(var resource=Assembly.GetExecutingAssembly().GetManifestResourceStream("payload.zip"))using(var zip=new ZipArchive(resource,ZipArchiveMode.Read))
+    using(var resource=PayloadPackage.OpenDocuments())using(var zip=new ZipArchive(resource,ZipArchiveMode.Read))
      foreach(var doc in new[]{new[]{I18n.Document("LEEME"),"Ayuda"},new[]{I18n.Document("TERMINOS"),"Términos del mod"},new[]{"LICENSE.txt","Licencia MIT (original)"},new[]{"NVIDIA-RTX-SDK-LICENSE.txt","NVIDIA RTX SDK (inglés original)"},new[]{"THIRD-PARTY-NOTICES.txt","Avisos de terceros (original)"},new[]{"AMD-FidelityFX-SDK-LICENSE.txt","AMD FidelityFX SDK (inglés original)"}}){
       string name=doc[0];
       var entry=zip.Entries.Single(e=>e.FullName.EndsWith("/"+name,StringComparison.Ordinal));
@@ -366,7 +366,7 @@ namespace GroundedDLSSSetup {
     var e=new Engine(target,EnginePath);e.Log=t=>Invoke(new Action(()=>log.AppendText(t+Environment.NewLine)));
     if(recovering){e.Recover();return;}if(!installing){e.Uninstall();return;}
     var payload=new Dictionary<string,byte[]>(StringComparer.OrdinalIgnoreCase);
-    using(var resource=Assembly.GetExecutingAssembly().GetManifestResourceStream("payload.zip")){
+    using(var resource=PayloadPackage.OpenInstall()){
      if(resource==null)throw new IOException(I18n.T("Falta el paquete integrado."));
      using(var zip=new ZipArchive(resource,ZipArchiveMode.Read))foreach(var entry in zip.Entries){if(entry.Name.Length==0)continue;using(var m=new MemoryStream()){using(var source=entry.Open())source.CopyTo(m);payload.Add(entry.FullName.Replace('/','\\'),m.ToArray());}}
     }

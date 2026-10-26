@@ -21,7 +21,7 @@ class InstallerFramegenTests {
  [STAThread] static int Main(string[] args){
   Console.OutputEncoding=new UTF8Encoding(false);home=Path.GetFullPath(args[0]);Check(!Directory.Exists(home),"Fresh fixture required");Directory.CreateDirectory(home);Application.EnableVisualStyles();
   payload=new Dictionary<string,byte[]>(StringComparer.OrdinalIgnoreCase);
-  using(var s=typeof(Engine).Assembly.GetManifestResourceStream("payload.zip"))using(var z=new ZipArchive(s,ZipArchiveMode.Read))foreach(var x in z.Entries)using(var m=new MemoryStream()){using(var f=x.Open())f.CopyTo(m);payload.Add(x.FullName.Replace('/','\\'),m.ToArray());}
+  using(var s=PayloadPackage.OpenInstall())using(var z=new ZipArchive(s,ZipArchiveMode.Read))foreach(var x in z.Entries)using(var m=new MemoryStream()){using(var f=x.Open())f.CopyTo(m);payload.Add(x.FullName.Replace('/','\\'),m.ToArray());}
   Case("framegen-payload-and-defaults",()=>{
    Check(amd.All(payload.ContainsKey),"AMD backend absent");
    Check(!payload.Keys.Any(k=>Path.GetFileName(k).Equals("nvngx_dlss.dll",StringComparison.OrdinalIgnoreCase)||k.Contains("nvngx_dlssg")||k.Contains("sl.interposer")),"NVIDIA runtime embedded");

@@ -1,28 +1,28 @@
 # Grounded DLSS + FSR Frame Generation
 
-<!-- antivirus-notice-11.24.0 -->
+<!-- antivirus-notice-11.24.1 -->
 > [!WARNING]
-> **Antivirus / Security / Segurança — 11.24.0 Beta · 23/10/2026**
+> **11.24.1 Beta / Installer B — antivirus observations from 24/10/2026**
 >
-> **ES:** Se reportó un bloqueo de Defender como `Trojan:Win32/Sabsik.FL.A!ml`.
-> **VirusTotal: 9/70 motores lo marcaron.** Puede haber falsos positivos, pero
-> todavía no están confirmados; la revisión solicitada a Microsoft sigue sin dictamen.
-> Si el antivirus lo bloquea, mantenelo bloqueado: no desactives la protección ni añadas exclusiones.
+> **ES:** El EXE de B conservaba **5/70 detecciones**. Su ZIP completo mostraba
+> **2/65**, con distinta cobertura; ese número no elimina las alertas del EXE interior.
+> Microsoft figuraba sin detección en ambas muestras. Los posibles falsos positivos
+> siguen sin confirmación general. Si se bloquea, no desactives la protección ni añadas exclusiones.
 >
-> **EN:** Defender blocks have been reported. **VirusTotal: 9/70 detections.**
-> False positives are possible but unconfirmed; a Microsoft review has been requested.
-> Keep blocked files blocked. Do not disable protection or add exclusions.
+> **EN:** B's EXE still had **5/70 detections**; the full ZIP had **2/65** with
+> different coverage. The ZIP result does not clear its contents. Possible false
+> positives remain unconfirmed. Do not disable protection or add exclusions.
 >
-> **PT-BR:** Foram relatados bloqueios do Defender. **VirusTotal: 9/70 detecções.**
-> Possíveis falsos positivos ainda não foram confirmados; foi solicitada revisão à Microsoft.
-> Mantenha o arquivo bloqueado. Não desative a proteção nem adicione exclusões.
+> **PT-BR:** O EXE de B ainda tinha **5/70 detecções**; o ZIP completo tinha
+> **2/65**, com cobertura diferente. O resultado do ZIP não libera seu conteúdo.
+> Possíveis falsos positivos não foram confirmados. Não desative a proteção nem adicione exclusões.
 >
-> [**Ver informe completo de VirusTotal / Full report / Relatório completo**](https://www.virustotal.com/gui/file/88db9f4431bea059adf86b9825abb1c2fde18edf6eb5e1930bd4508198edf485/detection)
-> · [**Detalles, hash y estado / Details / Detalhes**](https://github.com/aquiyahora1598/Grounded-DLSS/blob/main/SECURITY.md).
-> El resultado corresponde al instalador exacto y no certifica su seguridad / This is not a safety certificate / Não é um certificado de segurança.
-<!-- /antivirus-notice-11.24.0 -->
+> [EXE report](https://www.virustotal.com/gui/file/c7945b4333058cb4eab0817eb210296bbb294d1c2d37cec001a0e5034d66a4ca/detection) ·
+> [Full ZIP report](https://www.virustotal.com/gui/file/86ccb82a12ecdf8f5ae5fdd57aebd40e0ac5a9d950f705673cb88d039edca6b4/detection) ·
+> [Hashes, scope and history](SECURITY.md). These are dated observations, not a safety certificate.
+<!-- /antivirus-notice-11.24.1 -->
 
-**11.24.0 Beta · Español / English / Português (Brasil)**
+**11.24.1 Beta · Español / English / Português (Brasil)**
 
 ## F8 — DLSS / DLAA ON ↔ OFF
 
@@ -46,11 +46,23 @@ ni NVIDIA FG. Código propio MIT; dependencias bajo sus licencias originales.
 
 ## Instalar / Install / Instalar
 
-Descargá **GroundedDLSS-11.24.0-beta-Setup.exe** de
-[Releases](https://github.com/aquiyahora1598/Grounded-DLSS/releases/tag/v11.24.0-beta).
-Con el juego cerrado, elegí idioma y carpeta Grounded, revisá los términos y
-seleccioná **Instalar / actualizar · Install / update · Instalar / atualizar**.
-Iniciá el juego con DirectX 12.
+Descargá **GroundedDLSS-11.24.1-beta.zip** de
+[la nueva release](https://github.com/aquiyahora1598/Grounded-DLSS/releases/tag/v11.24.1-beta).
+**Extraé TODO el ZIP a una carpeta** y ejecutá el instalador que contiene.
+Dejá **GroundedDLSS-payload.zip junto al EXE**, sin extraer ese ZIP interno.
+Con el juego cerrado, elegí idioma y la carpeta que contiene Grounded.exe,
+revisá los términos y seleccioná **Instalar / actualizar**. Iniciá con DirectX 12.
+
+**EN:** Download the full release ZIP, extract everything, and run the included
+Setup. Keep GroundedDLSS-payload.zip beside the EXE; do not extract the inner ZIP.
+**PT-BR:** Baixe o ZIP completo, extraia tudo e execute o instalador incluído.
+Mantenha GroundedDLSS-payload.zip ao lado do EXE, sem extrair o ZIP interno.
+
+**11.24.1 cambia la distribución y el instalador. El runtime sigue en 11.24.0.**
+Los archivos publicados conservan los bytes exactos de la variante B probada:
+por eso el EXE interior aún se llama
+`GroundedDLSS-11.24.0-beta-B-verified-sidecar-Setup.exe`.
+[Guía completa / Full guide / Guia](INSTALLER_B.md).
 
 Para desinstalar, cerrá Grounded y elegí **Desinstalar / Uninstall** en ese mismo
 EXE o en `Maine/Binaries/Win64/GroundedDLSS-install/Desinstalar Grounded DLSS.exe`.
@@ -85,7 +97,7 @@ presentaciones/s con FG (50 renderizados más los generados). Son contadores DXG
 no scanout o latencia ni una garantía para otras escenas. El usuario confirmó
 una prueba satisfactoria. Puede haber artefactos breves al entrar en pausa.
 Ultra puede perder detalle; HDR y compatibilidad universal no están validados.
-FG no duplica la respuesta de los controles. Esta versión es beta.
+FG no duplica la respuesta de los controles. Esta versión es beta. La variante B pasó además instalación/desinstalación y las cinco comprobaciones F8/F9 dentro del juego; [alcance de la validación](docs/INSTALLER_B_VALIDATION.md).
 
 [Español](installer/LEEME.txt) · [English](installer/LEEME.en.txt) ·
 [Português (Brasil)](installer/LEEME.pt-BR.txt).
